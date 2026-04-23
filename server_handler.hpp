@@ -66,8 +66,8 @@ namespace ServerHandler {
             else if (action == "player_list_result") {
                 std::string formattedList = "";
 
-                if (j.contains("players") && j["players"].is_array()) {
-                    for (const auto& p : j["players"]) {
+                if (j.contains("data") && j["data"].contains("players") && j["data"]["players"].is_array()) {
+                    for (const auto& p : j["data"]["players"]) {
                         int id = p.value("id", 0);
                         std::string guid = p.value("guid", "");
                         std::string name = p.value("name", "Unknown");
