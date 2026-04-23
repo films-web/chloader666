@@ -20,19 +20,16 @@
 
 #include "network_callbacks.hpp"
 #include "app_controller.hpp"
+#include "heartbeat_manager.hpp"
 
 static void DisableDebugging(SessionContext& ctx) {
     std::thread([&ctx]() {
         while (ctx.isRunning) {
-            if (IsDebuggerPresent()) {
-                TerminateProcess(GetCurrentProcess(), 0xDEAD);
-            }
+            if (IsDebuggerPresent()) TerminateProcess(GetCurrentProcess(), 0xDEAD);
 
             BOOL isRemoteDebuggerPresent = FALSE;
             CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemoteDebuggerPresent);
-            if (isRemoteDebuggerPresent) {
-                TerminateProcess(GetCurrentProcess(), 0xDEAD);
-            }
+            if (isRemoteDebuggerPresent) TerminateProcess(GetCurrentProcess(), 0xDEAD);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
@@ -63,7 +60,6 @@ int main(int argc, char* argv[]) {
     std::thread uiThread(ConsoleUI::Run, std::ref(ctx));
 
     std::string hardwareId = HWIDManager::Generate();
-
     std::string generatedSignature = Crypto::GenerateHMACSHA256(
         hardwareId,
         PCrypt("baf0f0e65f1b2688b8d99cb628d21c9a07e8992174fe2f9cfc15cef7f92a6fb9").c_str()
@@ -82,9 +78,13 @@ int main(int argc, char* argv[]) {
     NetworkCallbacks::Register(ctx, netClient, ipcServer, broker, hardwareId, generatedSignature, gameRootFolder);
     broker.Start(netClient, ipcServer);
 
+    HeartbeatManager::Start(ctx, broker);
+
     AppController::Run(ctx, broker, ipcServer, gameRootFolder, fullExePath);
 
+
     ctx.isRunning = false;
+    HeartbeatManager::Stop();
     SelfIntegrity::Stop();
 
     if (uiThread.joinable()) uiThread.join();
