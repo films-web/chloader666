@@ -53,8 +53,12 @@ public:
                                 }
 
                                 bool readOk = false;
-                                if (ReadFile(hPipe, &inPkt, sizeof(int) * 3, NULL, &readOv) == FALSE) {
-                                    if (GetLastError() == ERROR_IO_PENDING) {
+
+                                // FIXED: Read the entire max-size packet in one fell swoop
+                                if (ReadFile(hPipe, &inPkt, sizeof(CH_Packet), NULL, &readOv) == FALSE) {
+                                    DWORD err = GetLastError();
+
+                                    if (err == ERROR_IO_PENDING) {
                                         if (WaitForSingleObject(readOv.hEvent, 2000) == WAIT_OBJECT_0) {
                                             if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
                                         }
@@ -62,44 +66,33 @@ public:
                                             CancelIo(hPipe);
                                         }
                                     }
+                                    else if (err == ERROR_MORE_DATA) {
+                                        // Handle case where packet is somehow larger than struct
+                                        if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
+                                    }
                                 }
                                 else {
                                     if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
                                 }
                                 CloseHandle(readOv.hEvent);
 
-                                if (readOk && bytesRead == sizeof(int) * 3) {
+                                // FIXED: If we read successfully, process the single buffer
+                                if (readOk && bytesRead >= (sizeof(int) * 3)) {
 
                                     if (inPkt.magic != CH_MAGIC_WORD) {
-                                        break;
+                                        break; // Invalid magic, disconnect
                                     }
 
-                                    if (inPkt.size > 0 && inPkt.size <= MAX_PAYLOAD_SIZE) {
-                                        OVERLAPPED payloadOv = { 0 };
-                                        payloadOv.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-                                        if (payloadOv.hEvent) {
-                                            if (ReadFile(hPipe, inPkt.payload, inPkt.size, NULL, &payloadOv) == FALSE) {
-                                                if (GetLastError() == ERROR_IO_PENDING) {
-                                                    if (WaitForSingleObject(payloadOv.hEvent, 2000) == WAIT_OBJECT_0) {
-                                                        GetOverlappedResult(hPipe, &payloadOv, &bytesRead, FALSE);
-                                                    }
-                                                    else {
-                                                        CancelIo(hPipe);
-                                                    }
-                                                }
-                                            }
-                                            CloseHandle(payloadOv.hEvent);
-                                        }
-                                        else {
-                                            break;
-                                        }
+                                    // Safely validate the stated size
+                                    if (inPkt.size >= 0 && inPkt.size <= MAX_PAYLOAD_SIZE) {
+                                        onPacketReceived(inPkt);
                                     }
-
-                                    onPacketReceived(inPkt);
+                                    else {
+                                        break; // Malformed packet size, disconnect
+                                    }
                                 }
                                 else {
-                                    break;
+                                    break; // Read failed or client disconnected
                                 }
                             }
                         }
