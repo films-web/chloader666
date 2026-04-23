@@ -25,6 +25,7 @@ namespace ServerHandler {
             if (action == "auth_result" && j.value("status", "") == "success") {
                 ctx.SetServerGuid(j["data"].value("guid", ""));
                 ctx.isAuthenticated = true;
+
                 broker.PushToWS(json({ {"action", "pk3_whitelist"} }).dump());
                 broker.PushToWS(json({ {"action", "payload"} }).dump());
             }
@@ -45,16 +46,23 @@ namespace ServerHandler {
                 ctx.hasReceivedDllInfo = true;
             }
             else if (action == "set_guid") {
-                std::string guid = j.value("guid", "");
+                std::string guid = "";
+                if (j.contains("data") && j["data"].contains("guid")) {
+                    guid = j["data"].value("guid", "");
+                }
+
                 if (!guid.empty()) {
                     broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, guid));
+
+                    broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
+                }
+                else {
+                    ctx.SetUiStatus("Error: Received empty GUID from server.");
                 }
             }
             else if (action == "crash_client") {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_CRASH_CLIENT));
             }
-
-
             else if (action == "player_list_result") {
                 std::string formattedList = "";
 
@@ -81,12 +89,6 @@ namespace ServerHandler {
             else if (action == "fairshot_ack") {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_FAIRSHOT_ACK));
             }
-        }
-        catch (const nlohmann::json::parse_error& e) {
-            ctx.SetUiStatus(std::string("JSON Parse Error: ") + e.what());
-        }
-        catch (const nlohmann::json::type_error& e) {
-            ctx.SetUiStatus(std::string("JSON Type Error: ") + e.what());
         }
         catch (const std::exception& e) {
             ctx.SetUiStatus(std::string("Server Handler Error: ") + e.what());

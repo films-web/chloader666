@@ -6,7 +6,6 @@
 #include "packet_builder.hpp"
 #include "json.hpp"
 #include <string>
-#include <algorithm>
 
 namespace IPCHandler {
 
@@ -45,6 +44,10 @@ namespace IPCHandler {
 
             if (!detectionResult.empty()) {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_CRASH_CLIENT));
+            }
+            else {
+                nlohmann::json request = { {"action", "request_guid"} };
+                broker.PushToWS(request.dump());
             }
         }
     }

@@ -53,46 +53,62 @@ public:
                                 }
 
                                 bool readOk = false;
+                                bool disconnected = false;
 
-                                // FIXED: Read the entire max-size packet in one fell swoop
                                 if (ReadFile(hPipe, &inPkt, sizeof(CH_Packet), NULL, &readOv) == FALSE) {
                                     DWORD err = GetLastError();
 
                                     if (err == ERROR_IO_PENDING) {
-                                        if (WaitForSingleObject(readOv.hEvent, 2000) == WAIT_OBJECT_0) {
-                                            if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
+                                        while (isRunning) {
+                                            DWORD waitRes = WaitForSingleObject(readOv.hEvent, 500);
+                                            if (waitRes == WAIT_OBJECT_0) {
+                                                if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) {
+                                                    readOk = true;
+                                                }
+                                                else {
+                                                    disconnected = true;
+                                                }
+                                                break;
+                                            }
                                         }
-                                        else {
+                                        if (!isRunning) {
                                             CancelIo(hPipe);
                                         }
                                     }
                                     else if (err == ERROR_MORE_DATA) {
-                                        // Handle case where packet is somehow larger than struct
                                         if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
+                                    }
+                                    else {
+                                        disconnected = true;
                                     }
                                 }
                                 else {
-                                    if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
+                                    if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) {
+                                        readOk = true;
+                                    }
+                                    else {
+                                        disconnected = true;
+                                    }
                                 }
+
                                 CloseHandle(readOv.hEvent);
 
-                                // FIXED: If we read successfully, process the single buffer
+                                if (disconnected) {
+                                    break;
+                                }
+
                                 if (readOk && bytesRead >= (sizeof(int) * 3)) {
 
                                     if (inPkt.magic != CH_MAGIC_WORD) {
-                                        break; // Invalid magic, disconnect
+                                        break; 
                                     }
 
-                                    // Safely validate the stated size
                                     if (inPkt.size >= 0 && inPkt.size <= MAX_PAYLOAD_SIZE) {
                                         onPacketReceived(inPkt);
                                     }
                                     else {
-                                        break; // Malformed packet size, disconnect
+                                        break;
                                     }
-                                }
-                                else {
-                                    break; // Read failed or client disconnected
                                 }
                             }
                         }

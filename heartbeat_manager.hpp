@@ -6,6 +6,7 @@
 
 #include "session_context.hpp"
 #include "message_broker.hpp"
+#include "packet_builder.hpp"
 
 class HeartbeatManager {
 private:
@@ -33,6 +34,8 @@ public:
 
                 if (ctx.isAuthenticated) {
                     broker.PushToWS(R"({"action": "heartbeat"})");
+
+                    broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
                 }
             }
             });
