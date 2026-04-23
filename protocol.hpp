@@ -19,7 +19,7 @@ enum CH_CMD {
 
 struct CH_Packet {
     unsigned int magic;
-    int type;
-    int size;
+    unsigned int type;
+    unsigned int size;
     unsigned char payload[MAX_PAYLOAD_SIZE + 1];
 };
