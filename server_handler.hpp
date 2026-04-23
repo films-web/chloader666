@@ -54,9 +54,7 @@ namespace ServerHandler {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_CRASH_CLIENT));
             }
 
-            // ----------------------------------------------------
-            // Anti-Cheat Routes
-            // ----------------------------------------------------
+
             else if (action == "player_list_result") {
                 std::string formattedList = "";
 
