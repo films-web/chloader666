@@ -21,5 +21,5 @@ struct CH_Packet {
     unsigned int magic;
     int type;
     int size;
-    unsigned char payload[MAX_PAYLOAD_SIZE];
+    unsigned char payload[MAX_PAYLOAD_SIZE + 1];
 };
