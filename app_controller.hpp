@@ -22,6 +22,9 @@ public:
 
         bus.Subscribe(EventType::AUTH_SUCCESS, [&bus, &ctx](const Event&) {
             bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Verifying Files...").c_str())) });
+            });
+
+        bus.Subscribe(EventType::WHITELIST_RECEIVED, [&bus](const Event&) {
             bus.Publish({ EventType::START_SCAN, std::monostate{} });
             });
 
