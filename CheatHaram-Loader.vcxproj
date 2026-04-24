@@ -171,6 +171,7 @@
     <ClInclude Include="poly_crypt.hpp" />
     <ClInclude Include="session_context.hpp" />
     <ClInclude Include="console_ui.hpp" />
+    <ClInclude Include="time_utils.hpp" />
     <ClInclude Include="url_launcher.hpp" />
   </ItemGroup>
   <ItemGroup>
