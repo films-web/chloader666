@@ -7,6 +7,7 @@
 #include "session_context.hpp"
 #include "message_broker.hpp"
 #include "packet_builder.hpp"
+#include "time_utils.hpp"
 
 using json = nlohmann::json;
 
@@ -51,7 +52,8 @@ namespace ServerHandler {
             else if (action == "set_guid") {
                 std::string guid = j.contains("data") ? j["data"].value("guid", "") : "";
                 if (!guid.empty()) {
-                    broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, guid));
+                    std::string timeStr = TimeUtils::GetFormattedTime();
+                    broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, "say ^3CheatHaram: ^6GUID: ^7" + guid + " ^1" + timeStr + "\n"));
                     broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
                 }
             }
