@@ -8,6 +8,15 @@
 #include <vector>
 #include <variant>
 #include <string>
+#include <utility>
+
+enum class UiStatusType {
+    INFO_STATE,
+    LOADING,
+    SUCCESS,
+    ACTIVE,
+    ERROR_STATE
+};
 
 enum class EventType {
     UI_STATUS_UPDATE,
@@ -29,7 +38,7 @@ enum class EventType {
 
 struct Event {
     EventType type;
-    std::variant<std::monostate, std::string, std::vector<std::string>> payload;
+    std::variant<std::monostate, std::string, std::vector<std::string>, std::pair<UiStatusType, std::string>> payload;
 };
 
 class EventBus {

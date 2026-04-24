@@ -17,8 +17,7 @@
 #include "network_client.hpp"
 #include "message_broker.hpp"
 #include "url_launcher.hpp"
-#include "server_handler.hpp"
-#include "ipc_handler.hpp"
+#include "network_callbacks.hpp" // <-- Added this
 #include "app_controller.hpp"
 #include "heartbeat_manager.hpp"
 
@@ -92,38 +91,13 @@ int main(int argc, char* argv[]) {
 
     std::thread urlThread = UrlLauncher::StartPrimaryListener(bus, globalRunning);
 
-    netClient.Start(std::string(Constants::WsUrl().c_str()),
-        [&bus, &broker, hardwareId, generatedSignature](bool isConnected, const std::string& errorMsg) {
-            broker.SetNetworkStatus(isConnected);
-            if (isConnected) {
-                bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Authenticating...").c_str()) });
-                nlohmann::json authPayload = {
-                    {"action", "auth"},
-                    {"data", {
-                        {"hwid", hardwareId},
-                        {"signature", generatedSignature},
-                        {"currentName", "UnnamedPlayer"}
-                    }}
-                };
-                broker.PushToWS(authPayload.dump());
-            }
-            else {
-                bus.Publish({ EventType::UI_STATUS_UPDATE, errorMsg.empty() ? std::string(PCrypt("Disconnected.").c_str()) : std::string(PCrypt("Net Error: ").c_str()) + errorMsg });
-            }
-        },
-        [&bus, &ctx, &broker](const std::string& msg) {
-            ServerHandler::ProcessMessage(msg, bus, ctx, broker);
-        }
-    );
-
-    ipcServer.Start(std::string(Constants::IpcPipeName().c_str()), [&broker, &bus](const CH_Packet& pkt) {
-        IPCHandler::ProcessMessage(pkt, broker, bus);
-        });
+    NetworkCallbacks::Register(bus, ctx, netClient, ipcServer, broker, hardwareId, generatedSignature);
 
     broker.Start(netClient, ipcServer);
+
     HeartbeatManager::Start(ctx, broker);
 
-    bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Connecting to Server...").c_str()) });
+    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Connecting to Server...").c_str())) });
 
     bus.RunDispatcher();
 

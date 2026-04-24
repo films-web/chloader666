@@ -22,8 +22,8 @@ public:
 
         hbThread = std::thread([&ctx, &broker]() {
             std::unique_lock<std::mutex> lock(hbMutex);
+            while (isRunning) {
 
-            while (isRunning && ctx.isRunning) {
                 bool shutdownTriggered = hbCv.wait_for(lock, std::chrono::seconds(30), [] {
                     return !isRunning.load();
                     });
@@ -34,7 +34,6 @@ public:
 
                 if (ctx.isAuthenticated) {
                     broker.PushToWS(R"({"action": "heartbeat"})");
-
                     broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
                 }
             }

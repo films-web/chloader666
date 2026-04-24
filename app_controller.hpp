@@ -3,6 +3,7 @@
 #include <thread>
 #include <algorithm>
 #include <cctype>
+#include <utility>
 
 #include "event_bus.hpp"
 #include "session_context.hpp"
@@ -20,7 +21,7 @@ public:
     static void Register(EventBus& bus, SessionContext& ctx, MessageBroker& broker, IPCServer& ipc, const std::string& root, const std::string& exe) {
 
         bus.Subscribe(EventType::AUTH_SUCCESS, [&bus, &ctx](const Event&) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Verifying Files...").c_str()) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Verifying Files...").c_str())) });
             bus.Publish({ EventType::START_SCAN, std::monostate{} });
             });
 
@@ -38,7 +39,7 @@ public:
 
         bus.Subscribe(EventType::SCAN_FAILED, [&bus](const Event& e) {
             std::string detectedFile = std::get<std::string>(e.payload);
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Detected: ").c_str()) + detectedFile });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Detected: ").c_str()) + detectedFile) });
             std::thread([&bus]() {
                 std::this_thread::sleep_for(std::chrono::seconds(3));
                 bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
@@ -46,7 +47,7 @@ public:
             });
 
         bus.Subscribe(EventType::SCAN_COMPLETED, [&bus](const Event&) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Ready. Waiting for Game...").c_str()) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Ready. Waiting for Game...").c_str())) });
             bus.Publish({ EventType::INJECT_PAYLOAD, std::monostate{} });
             });
 
@@ -59,10 +60,9 @@ public:
                 char p[MAX_PATH];
                 GetFullPathNameA(ctx.GetDllName().c_str(), MAX_PATH, p, nullptr);
 
-                bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Downloading Payload...").c_str()) });
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Downloading Payload...").c_str())) });
 
                 if (Downloader::DownloadHttps(ctx.GetDllUrl(), p)) {
-
                     std::string expectedHash = ctx.GetDllHash();
                     std::string actualHash = Crypto::CalculateSHA256File(p);
 
@@ -73,7 +73,7 @@ public:
                     }
 
                     if (hashMatches) {
-                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Injecting...").c_str()) });
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Injecting...").c_str())) });
 
                         if (Injector::LaunchAndInject(exe, p)) {
                             DeleteFileA(p);
@@ -81,23 +81,23 @@ public:
                         }
                         else {
                             DeleteFileA(p);
-                            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Injection Failed.").c_str()) });
+                            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Injection Failed.").c_str())) });
                         }
                     }
                     else {
                         DeleteFileA(p);
-                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Error: Payload Hash Mismatch!").c_str()) });
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Payload Hash Mismatch!").c_str())) });
                     }
 
                 }
                 else {
-                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Download Failed.").c_str()) });
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Download Failed.").c_str())) });
                 }
                 }).detach();
             });
 
         bus.Subscribe(EventType::INJECTION_SUCCESS, [&bus, &ctx](const Event&) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Active.").c_str()) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ACTIVE, std::string(PCrypt("Active.").c_str())) });
             DWORD pid = Injector::GetProcessIdByName(Constants::TargetExe().c_str());
             DllIntegrity::Start(pid, ctx.GetDllName());
 

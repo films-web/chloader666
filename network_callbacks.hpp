@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
+#include <utility>
 #include "json.hpp"
+#include "event_bus.hpp"
 #include "session_context.hpp"
 #include "network_client.hpp"
 #include "message_broker.hpp"
@@ -13,13 +15,14 @@
 using json = nlohmann::json;
 
 namespace NetworkCallbacks {
-    inline void Register(SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker,
-        const std::string& hwid, const std::string& signature, const std::string& gameRootFolder) {
+    inline void Register(EventBus& bus, SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker,
+        const std::string& hwid, const std::string& signature) {
+
         netClient.Start(std::string(Constants::WsUrl().c_str()),
-            [&ctx, &broker, hwid, signature](bool isConnected, const std::string& errorMsg) {
+            [&bus, &broker, hwid, signature](bool isConnected, const std::string& errorMsg) {
                 broker.SetNetworkStatus(isConnected);
                 if (isConnected) {
-                    ctx.SetUiStatus(PCrypt("Authenticating...").c_str());
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Authenticating...").c_str())) });
 
                     json authPayload = {
                         {"action", "auth"},
@@ -32,18 +35,18 @@ namespace NetworkCallbacks {
                     broker.PushToWS(authPayload.dump());
                 }
                 else {
-                    ctx.SetUiStatus(errorMsg.empty() ? PCrypt("Disconnected.").c_str() : PCrypt("Net Error: ").c_str() + errorMsg);
-                    ctx.SetServerGuid("-");
-                    ctx.isAuthenticated = false;
+                    std::string msg = errorMsg.empty() ? std::string(PCrypt("Disconnected.").c_str()) : std::string(PCrypt("Net Error: ").c_str()) + errorMsg;
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, msg) });
+                    bus.Publish({ EventType::AUTH_FAILED, std::monostate{} });
                 }
             },
-            [&ctx, &netClient, &broker](const std::string& msg) {
-                ServerHandler::ProcessMessage(msg, ctx, broker, netClient);
+            [&bus, &ctx, &broker](const std::string& msg) {
+                ServerHandler::ProcessMessage(msg, bus, ctx, broker);
             }
         );
 
-        ipcServer.Start(std::string(Constants::IpcPipeName().c_str()), [&broker, &ctx, gameRootFolder](const CH_Packet& pkt) {
-            IPCHandler::ProcessMessage(pkt, broker, ctx, gameRootFolder);
+        ipcServer.Start(std::string(Constants::IpcPipeName().c_str()), [&broker, &bus](const CH_Packet& pkt) {
+            IPCHandler::ProcessMessage(pkt, broker, bus);
             });
     }
 }

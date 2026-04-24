@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <utility>
 #include "json.hpp"
 #include "event_bus.hpp"
 #include "session_context.hpp"
@@ -15,7 +16,7 @@ namespace ServerHandler {
             json j = json::parse(msg);
 
             if (j.value("status", "") == "error") {
-                bus.Publish({ EventType::UI_STATUS_UPDATE, "Auth Failed: " + j.value("message", "Unknown error") });
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, "Auth Failed: " + j.value("message", "Unknown error")) });
                 return;
             }
 
@@ -78,7 +79,7 @@ namespace ServerHandler {
             }
         }
         catch (const std::exception& e) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string("Server Error: ") + e.what() });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string("Server Error: ") + e.what()) });
         }
     }
 }

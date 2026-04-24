@@ -3,10 +3,11 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
+#include <utility>
+#include "event_bus.hpp"
 
 class SessionContext {
 public:
-    std::atomic<bool> isRunning{ true };
     std::atomic<bool> isAuthenticated{ false };
     std::atomic<bool> hasReceivedWhitelist{ false };
     std::atomic<bool> hasReceivedDllInfo{ false };
@@ -41,13 +42,15 @@ public:
         return targetServer;
     }
 
-    void SetUiStatus(const std::string& status) {
+    void SetUiStatus(UiStatusType type, const std::string& status) {
         std::lock_guard<std::mutex> lock(uiMutex);
+        uiStatusType = type;
         uiStatus = status;
     }
-    std::string GetUiStatus() {
+
+    std::pair<UiStatusType, std::string> GetUiStatus() {
         std::lock_guard<std::mutex> lock(uiMutex);
-        return uiStatus;
+        return { uiStatusType, uiStatus };
     }
 
     void SetServerGuid(const std::string& guid) {
@@ -69,6 +72,7 @@ private:
     std::string targetServer;
 
     std::mutex uiMutex;
+    UiStatusType uiStatusType = UiStatusType::INFO_STATE;
     std::string uiStatus = "Initializing...";
     std::string serverGuid = "-";
 };
