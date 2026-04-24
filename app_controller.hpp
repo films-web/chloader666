@@ -62,7 +62,6 @@ public:
         bus.Subscribe(EventType::INJECT_PAYLOAD, [&bus, &ctx, exe](const Event&) {
             std::thread([&bus, &ctx, exe]() {
 
-                // 1. If the game is already running, show error, wait 3 seconds, and EXIT loader
                 if (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Game already running! Close it first.").c_str())) });
                     std::this_thread::sleep_for(std::chrono::seconds(3));
