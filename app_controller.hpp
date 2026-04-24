@@ -49,9 +49,14 @@ public:
                 }).detach();
             });
 
-        bus.Subscribe(EventType::SCAN_COMPLETED, [&bus](const Event&) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Starting Game...").c_str())) });
-            bus.Publish({ EventType::INJECT_PAYLOAD, std::monostate{} });
+        bus.Subscribe(EventType::SCAN_COMPLETED, [&bus, &ctx](const Event&) {
+            if (ctx.isInjected) {
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ACTIVE, std::string(PCrypt("Active").c_str())) });
+            }
+            else {
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Starting Game...").c_str())) });
+                bus.Publish({ EventType::INJECT_PAYLOAD, std::monostate{} });
+            }
             });
 
         bus.Subscribe(EventType::INJECT_PAYLOAD, [&bus, &ctx, exe](const Event&) {
@@ -111,14 +116,17 @@ public:
             });
 
         bus.Subscribe(EventType::INJECTION_SUCCESS, [&bus, &ctx](const Event&) {
+            ctx.isInjected = true;
+
             bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ACTIVE, std::string(PCrypt("Active.").c_str())) });
             DWORD pid = Injector::GetProcessIdByName(Constants::TargetExe().c_str());
             DllIntegrity::Start(pid, ctx.GetDllName());
-            std::thread([&bus]() {
+            std::thread([&bus, &ctx]() {
                 while (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
                     std::this_thread::sleep_for(std::chrono::seconds(1));
                 }
                 DllIntegrity::Stop();
+                ctx.isInjected = false;
                 bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                 }).detach();
             });
