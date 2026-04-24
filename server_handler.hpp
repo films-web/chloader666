@@ -53,7 +53,7 @@ namespace ServerHandler {
                 std::string guid = j.contains("data") ? j["data"].value("guid", "") : "";
                 if (!guid.empty()) {
                     std::string timeStr = TimeUtils::GetFormattedTime();
-                    broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, "say ^3CheatHaram: ^6GUID: ^7" + guid + " ^1" + timeStr + "\n"));
+                    broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, "say ^3CheatHaram: ^6Guid: ^7" + guid + " ^1" + timeStr + "\n"));
                     broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
                 }
             }
