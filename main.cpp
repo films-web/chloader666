@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     bus.Subscribe(EventType::URL_CONNECT_REQUESTED, [&ctx, &broker](const Event& e) {
         std::string ip = std::get<std::string>(e.payload);
         ctx.SetTargetServer(ip);
-        broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_CONNECT_SERVER, ip));
+        broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_CONNECT_SERVER, "connect " + ip + "\n"));
         });
 
     bus.Subscribe(EventType::CRASH_REQUESTED, [&broker](const Event&) {
