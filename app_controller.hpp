@@ -50,14 +50,17 @@ public:
             });
 
         bus.Subscribe(EventType::SCAN_COMPLETED, [&bus](const Event&) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Ready. Waiting for Game...").c_str())) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Starting Game...").c_str())) });
             bus.Publish({ EventType::INJECT_PAYLOAD, std::monostate{} });
             });
 
         bus.Subscribe(EventType::INJECT_PAYLOAD, [&bus, &ctx, exe](const Event&) {
             std::thread([&bus, &ctx, exe]() {
-                while (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                if (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Game already running! Close it first.").c_str())) });
+                    std::this_thread::sleep_for(std::chrono::seconds(3));
+                    bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
+                    return;
                 }
 
                 char p[MAX_PATH];
