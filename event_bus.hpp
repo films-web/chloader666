@@ -75,6 +75,7 @@ public:
                 }
 
                 if (currentEvent.type == EventType::SHUTDOWN_REQUESTED) {
+                    Dispatch(currentEvent);
                     isRunning = false;
                     break;
                 }
