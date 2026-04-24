@@ -28,7 +28,18 @@ public:
         if (!mz_zip_reader_init_file(&zip_archive, filepath.c_str(), 0)) return "";
 
         static const std::unordered_set<uint32_t> bannedFileHashes = {
-            CHash("weapons.shader"), CHash("average_armor.shader"), CHash("sof2mp_cgame.qvm")
+            CHash("average_armor.shader"),
+            CHash("suit_long_coat.shader"),
+            CHash("average_sleeves.shader"),
+            CHash("suit_sleeves.shader"),
+            CHash("female_skirt.shader"),
+            CHash("chem_suit.shader"),
+            CHash("fat.shader"),
+            CHash("female_armor.shader"),
+            CHash("female_pants.shader"),
+            CHash("bolt_ons.shader"),
+            CHash("weapons.shader"),
+            CHash("sof2mp_cgame.qvm")
         };
 
         std::string detected = "";
@@ -39,8 +50,11 @@ public:
             std::string baseName = std::filesystem::path(file_stat.m_filename).filename().string();
             ToLowerInPlace(baseName);
 
-            if (bannedFileHashes.count(ConstHash::RunTime(baseName)) || baseName.find(PCrypt("wallhack").c_str()) != std::string::npos) {
-                detected = baseName; break;
+            bool isGlm = (baseName.length() >= 4 && baseName.substr(baseName.length() - 4) == PCrypt(".glm").c_str());
+
+            if (isGlm || bannedFileHashes.count(ConstHash::RunTime(baseName))) {
+                detected = baseName;
+                break;
             }
         }
         mz_zip_reader_end(&zip_archive);
@@ -59,7 +73,7 @@ public:
                 ToLowerInPlace(hash);
                 if (!fastWhitelist.count(hash)) {
                     std::string internal = DeepScanPk3(entry.path().string());
-                    if (!internal.empty()) return entry.path().filename().string() + " -> " + internal;
+                    if (!internal.empty()) return entry.path().filename().string();
                 }
             }
         }
