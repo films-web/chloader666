@@ -55,8 +55,12 @@ int main(int argc, char* argv[]) {
     ctx.SetTargetServer(targetServerArg);
 
     std::atomic<bool> globalRunning{ true };
-    bus.Subscribe(EventType::SHUTDOWN_REQUESTED, [&globalRunning](const Event&) {
+    std::mutex mainMutex;
+    std::condition_variable mainCv;
+
+    bus.Subscribe(EventType::SHUTDOWN_REQUESTED, [&globalRunning, &mainCv](const Event&) {
         globalRunning = false;
+        mainCv.notify_all();
         });
 
     DisableDebugging(globalRunning);
@@ -100,10 +104,9 @@ int main(int argc, char* argv[]) {
     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Connecting to Server...").c_str())) });
 
     bus.RunDispatcher();
-
-    while (globalRunning) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    
+    std::unique_lock<std::mutex> lock(mainMutex);
+    mainCv.wait(lock, [&globalRunning] { return !globalRunning.load(); });
 
     HeartbeatManager::Stop();
     SelfIntegrity::Stop();
