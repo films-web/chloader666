@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <thread>
+#include <algorithm>
+#include <cctype>
+
 #include "event_bus.hpp"
 #include "session_context.hpp"
 #include "message_broker.hpp"
@@ -10,6 +13,7 @@
 #include "injector.hpp"
 #include "constants.hpp"
 #include "dll_integrity.hpp"
+#include "crypto.hpp"
 
 class AppController {
 public:
@@ -55,12 +59,39 @@ public:
                 char p[MAX_PATH];
                 GetFullPathNameA(ctx.GetDllName().c_str(), MAX_PATH, p, nullptr);
 
-                if (Downloader::DownloadHttps(ctx.GetDllUrl(), p) && Injector::LaunchAndInject(exe, p)) {
-                    DeleteFileA(p);
-                    bus.Publish({ EventType::INJECTION_SUCCESS, std::monostate{} });
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Downloading Payload...").c_str()) });
+
+                if (Downloader::DownloadHttps(ctx.GetDllUrl(), p)) {
+
+                    std::string expectedHash = ctx.GetDllHash();
+                    std::string actualHash = Crypto::CalculateSHA256File(p);
+
+                    bool hashMatches = false;
+                    if (expectedHash.length() == actualHash.length() && !expectedHash.empty()) {
+                        hashMatches = std::equal(expectedHash.begin(), expectedHash.end(), actualHash.begin(),
+                            [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+                    }
+
+                    if (hashMatches) {
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Injecting...").c_str()) });
+
+                        if (Injector::LaunchAndInject(exe, p)) {
+                            DeleteFileA(p);
+                            bus.Publish({ EventType::INJECTION_SUCCESS, std::monostate{} });
+                        }
+                        else {
+                            DeleteFileA(p);
+                            bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Injection Failed.").c_str()) });
+                        }
+                    }
+                    else {
+                        DeleteFileA(p);
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Error: Payload Hash Mismatch!").c_str()) });
+                    }
+
                 }
                 else {
-                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Injection Failed.").c_str()) });
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::string(PCrypt("Download Failed.").c_str()) });
                 }
                 }).detach();
             });
