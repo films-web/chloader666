@@ -56,6 +56,8 @@ public:
 
         bus.Subscribe(EventType::INJECT_PAYLOAD, [&bus, &ctx, exe](const Event&) {
             std::thread([&bus, &ctx, exe]() {
+
+                // 1. If the game is already running, show error, wait 3 seconds, and EXIT loader
                 if (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Game already running! Close it first.").c_str())) });
                     std::this_thread::sleep_for(std::chrono::seconds(3));
@@ -88,16 +90,22 @@ public:
                         else {
                             DeleteFileA(p);
                             bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Injection Failed.").c_str())) });
+                            std::this_thread::sleep_for(std::chrono::seconds(3));
+                            bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                         }
                     }
                     else {
                         DeleteFileA(p);
                         bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Payload Hash Mismatch!").c_str())) });
+                        std::this_thread::sleep_for(std::chrono::seconds(3));
+                        bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                     }
 
                 }
                 else {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Download Failed.").c_str())) });
+                    std::this_thread::sleep_for(std::chrono::seconds(3));
+                    bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                 }
                 }).detach();
             });
@@ -106,7 +114,6 @@ public:
             bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ACTIVE, std::string(PCrypt("Active.").c_str())) });
             DWORD pid = Injector::GetProcessIdByName(Constants::TargetExe().c_str());
             DllIntegrity::Start(pid, ctx.GetDllName());
-
             std::thread([&bus]() {
                 while (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
                     std::this_thread::sleep_for(std::chrono::seconds(1));
