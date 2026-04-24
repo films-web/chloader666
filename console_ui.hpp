@@ -1,34 +1,23 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <thread>
-#include <chrono>
 #include <cstdlib>
-
+#include "event_bus.hpp"
 #include "session_context.hpp"
 
 namespace ConsoleUI {
+    inline void Register(EventBus& bus, SessionContext& ctx) {
+        bus.Subscribe(EventType::UI_STATUS_UPDATE, [&ctx](const Event& e) {
+            std::string currentStatus = std::get<std::string>(e.payload);
+            ctx.SetUiStatus(currentStatus);
 
-    inline void Run(SessionContext& ctx) {
-        std::string lastStatus = "";
-
-        while (ctx.isRunning) {
-            std::string currentStatus = ctx.GetUiStatus();
-
-            if (currentStatus != lastStatus) {
-                system("cls");
-
-                std::cout << "====================================\n";
-                std::cout << "        CheatHaram Loader           \n";
-                std::cout << "====================================\n";
-                std::cout << " Server GUID: " << ctx.GetServerGuid() << "\n";
-                std::cout << " Status:      " << currentStatus << "\n";
-                std::cout << "====================================\n";
-
-                lastStatus = currentStatus;
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        }
+            system("cls");
+            std::cout << "====================================\n";
+            std::cout << "        CheatHaram Loader           \n";
+            std::cout << "====================================\n";
+            std::cout << " Server GUID: " << ctx.GetServerGuid() << "\n";
+            std::cout << " Status:      " << currentStatus << "\n";
+            std::cout << "====================================\n";
+            });
     }
 }
