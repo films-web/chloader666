@@ -17,7 +17,7 @@
 #include "network_client.hpp"
 #include "message_broker.hpp"
 #include "url_launcher.hpp"
-#include "network_callbacks.hpp" // <-- Added this
+#include "network_callbacks.hpp"
 #include "app_controller.hpp"
 #include "heartbeat_manager.hpp"
 
