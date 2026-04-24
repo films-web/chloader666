@@ -29,7 +29,6 @@ namespace NetworkCallbacks {
                         {"data", {
                             {"hwid", hwid},
                             {"signature", signature},
-                            {"currentName", "UnnamedPlayer"}
                         }}
                     };
                     broker.PushToWS(authPayload.dump());
