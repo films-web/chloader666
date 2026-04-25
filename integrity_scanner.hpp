@@ -32,7 +32,6 @@ private:
         for (char& c : str) { c = std::tolower(static_cast<unsigned char>(c)); }
     }
 
-private:
     static ScanReport DeepScanPk3(const std::string& filepath) {
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
@@ -54,7 +53,11 @@ private:
             CHash("sof2mp_cgame.qvm")
         };
 
-        static const std::string glmExt = ".glm";
+        static const std::string glmExt = []() -> std::string {
+            auto s = PCrypt(".glm");
+            return std::string(s.c_str());
+            }();
+
         ScanReport report = { ScanResult::CLEAN, "" };
 
         int fileCount = (int)mz_zip_reader_get_num_files(&zip_archive);
@@ -79,12 +82,16 @@ private:
         return report;
     }
 
+public:
     static ScanReport VerifyGameFolder(const std::string& gameRoot,
         const std::vector<std::string>& whitelist) {
         if (!std::filesystem::exists(gameRoot))
             return { ScanResult::INVALID_PATH, gameRoot };
 
-        static const std::string pk3Ext = ".pk3";
+        static const std::string pk3Ext = []() -> std::string {
+            auto s = PCrypt(".pk3");
+            return std::string(s.c_str());
+            }();
 
         std::unordered_set<std::string> fastWhitelist;
         for (auto h : whitelist) { ToLowerInPlace(h); fastWhitelist.insert(h); }
