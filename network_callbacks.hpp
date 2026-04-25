@@ -58,7 +58,7 @@ namespace NetworkCallbacks {
 
                 else {
                     if (ctx.isInjected) {
-                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::INFO_STATE, std::string(PCrypt("Game Disconnected.").c_str())) });
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Game Disconnected.").c_str())) });
                     }
                 }
             }
