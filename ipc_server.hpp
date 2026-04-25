@@ -42,10 +42,6 @@ public:
                         }
 
                         if (connected && isRunning) {
-
-                            isClientConnected = true;
-                            if (onConnectionChange) onConnectionChange(true);
-
                             while (isRunning) {
                                 CH_Packet inPkt = { 0 };
                                 DWORD bytesRead = 0;
@@ -63,7 +59,7 @@ public:
 
                                     if (err == ERROR_IO_PENDING) {
                                         while (isRunning) {
-                                            DWORD waitRes = WaitForSingleObject(readOv.hEvent, 500);
+                                            DWORD waitRes = WaitForSingleObject(readOv.hEvent, 1000);
                                             if (waitRes == WAIT_OBJECT_0) {
                                                 if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) {
                                                     readOk = true;
@@ -98,6 +94,14 @@ public:
 
                                 if (readOk && bytesRead >= (sizeof(int) * 3)) {
                                     if (inPkt.magic != CH_MAGIC_WORD) break;
+
+                                    if (inPkt.type == 12) {
+                                        if (!isClientConnected) {
+                                            isClientConnected = true;
+                                            if (onConnectionChange) onConnectionChange(true);
+                                        }
+                                        continue;
+                                    }
 
                                     if (inPkt.size >= 0 && inPkt.size <= MAX_PAYLOAD_SIZE) {
                                         onPacketReceived(inPkt);
