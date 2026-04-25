@@ -21,10 +21,11 @@ public:
     static void Register(EventBus& bus, SessionContext& ctx, MessageBroker& broker, IPCServer& ipc, const std::string& root, const std::string& exe) {
 
         bus.Subscribe(EventType::AUTH_SUCCESS, [&bus](const Event&) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Verifying Files...").c_str())) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Authenticated").c_str())) });
             });
 
         bus.Subscribe(EventType::WHITELIST_RECEIVED, [&bus](const Event&) {
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Verifying Files...").c_str())) });
             bus.Publish({ EventType::START_SCAN, std::monostate{} });
             });
 
