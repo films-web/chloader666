@@ -75,9 +75,11 @@ int main(int argc, char* argv[]) {
     NetworkClient netClient;
     MessageBroker broker;
 
-    char fullExePath[MAX_PATH];
-    GetFullPathNameA(Constants::TargetExe().c_str(), MAX_PATH, fullExePath, nullptr);
-    std::string gameRootFolder = std::filesystem::path(fullExePath).parent_path().string();
+    char loaderPath[MAX_PATH];
+    GetModuleFileNameA(NULL, loaderPath, MAX_PATH);
+    std::string gameRootFolder = std::filesystem::path(loaderPath).parent_path().string();
+    std::string fullExePath = gameRootFolder + "\\" + std::string(Constants::TargetExe().c_str());
+
 
     AppController::Register(bus, ctx, broker, ipcServer, gameRootFolder, fullExePath);
 
