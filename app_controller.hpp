@@ -116,8 +116,6 @@ public:
 
         bus.Subscribe(EventType::INJECTION_SUCCESS, [&bus, &ctx](const Event&) {
             ctx.isInjected = true;
-
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Injected. Waiting for Game...").c_str())) });
             DWORD pid = Injector::GetProcessIdByName(Constants::TargetExe().c_str());
             DllIntegrity::Start(pid, ctx.GetDllName());
             std::thread([&bus, &ctx]() {
