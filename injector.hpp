@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <string>
+#include <filesystem>
 
 class Injector {
 public:
@@ -32,8 +33,19 @@ public:
     static bool LaunchAndInject(const std::string& exePath, const std::string& dllPath) {
         STARTUPINFOA si = { sizeof(si) };
         PROCESS_INFORMATION pi = { 0 };
+        std::string gameDir = std::filesystem::path(exePath).parent_path().string();
 
-        if (!CreateProcessA(exePath.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi)) return false;
+        if (!CreateProcessA(
+            exePath.c_str(),
+            NULL,
+            NULL,
+            NULL,
+            FALSE,
+            CREATE_SUSPENDED,
+            NULL,
+            gameDir.c_str(),
+            &si,
+            &pi)) return false;
 
         void* allocMem = VirtualAllocEx(pi.hProcess, nullptr, dllPath.length() + 1, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         if (!allocMem) { TerminateProcess(pi.hProcess, 1); return false; }
