@@ -66,8 +66,8 @@ public:
             }
             });
 
-        bus.Subscribe(EventType::INJECT_PAYLOAD, [&bus, &ctx, exe](const Event&) {
-            std::thread([&bus, &ctx, exe]() {
+        bus.Subscribe(EventType::INJECT_PAYLOAD, [&bus, &ctx, exe, root](const Event&) {
+            std::thread([&bus, &ctx, exe, root]() {
 
                 if (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Game already running! Close it first.").c_str())) });
@@ -76,8 +76,8 @@ public:
                     return;
                 }
 
-                char p[MAX_PATH];
-                GetFullPathNameA(ctx.GetDllName().c_str(), MAX_PATH, p, nullptr);
+                std::string targetPathStr = root + "\\" + ctx.GetDllName();
+                const char* p = targetPathStr.c_str();
 
                 bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Downloading Payload...").c_str())) });
 
