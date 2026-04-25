@@ -103,8 +103,7 @@ public:
 
             ScanReport inner = DeepScanPk3(entry.path().string());
             if (inner.result == ScanResult::HACK_DETECTED)
-                return { ScanResult::HACK_DETECTED,
-                         entry.path().filename().string() + " -> " + inner.detectedFile };
+                return { ScanResult::HACK_DETECTED, entry.path().filename().string() };
         }
 
         return { ScanResult::CLEAN, "" };
