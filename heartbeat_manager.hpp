@@ -34,7 +34,10 @@ public:
 
                 if (ctx.isAuthenticated) {
                     broker.PushToWS(R"({"action": "heartbeat"})");
-                    broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
+
+                    if (ctx.isInjected && ctx.isGameConnected) {
+                        broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
+                    }
                 }
             }
             });

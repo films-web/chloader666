@@ -11,10 +11,15 @@
 
 class MessageBroker {
 public:
-    MessageBroker() : isRunning(false), isNetworkConnected(false) {}
+    MessageBroker() : isRunning(false), isNetworkConnected(false), isIpcConnected(false) {}
     ~MessageBroker() { Stop(); }
 
     void SetNetworkStatus(bool status) { isNetworkConnected = status; }
+
+    void SetIpcStatus(bool status) {
+        isIpcConnected = status;
+        ipcCv.notify_all();
+    }
 
     void Start(NetworkClient& netClient, IPCServer& ipcServer) {
         isRunning = true;
@@ -43,7 +48,8 @@ public:
                 CH_Packet pkt;
                 {
                     std::unique_lock<std::mutex> lock(ipcMutex);
-                    ipcCv.wait(lock, [this] { return !ipcQueue.empty() || !isRunning; });
+
+                    ipcCv.wait(lock, [this] { return (!ipcQueue.empty() && isIpcConnected) || !isRunning; });
 
                     if (!isRunning) break;
 
@@ -91,4 +97,5 @@ private:
     std::thread wsThread, ipcThread;
     std::atomic<bool> isRunning;
     std::atomic<bool> isNetworkConnected;
+    std::atomic<bool> isIpcConnected;
 };

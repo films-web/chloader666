@@ -44,8 +44,24 @@ namespace NetworkCallbacks {
             }
         );
 
-        ipcServer.Start(std::string(Constants::IpcPipeName().c_str()), [&broker, &bus](const CH_Packet& pkt) {
-            IPCHandler::ProcessMessage(pkt, broker, bus);
-            });
+        ipcServer.Start(std::string(Constants::IpcPipeName().c_str()),
+            [&broker, &bus](const CH_Packet& pkt) {
+                IPCHandler::ProcessMessage(pkt, broker, bus);
+            },
+            [&ctx, &bus, &broker](bool isConnected) {
+                ctx.isGameConnected = isConnected;
+                broker.SetIpcStatus(isConnected);
+
+                if (isConnected) {
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Active").c_str())) });
+                }
+
+                else {
+                    if (ctx.isInjected) {
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::INFO_STATE, std::string(PCrypt("Game Disconnected.").c_str())) });
+                    }
+                }
+            }
+        );
     }
 }

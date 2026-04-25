@@ -13,6 +13,7 @@ public:
     std::atomic<bool> hasReceivedDllInfo{ false };
     std::atomic<bool> isGameFolderClean{ false };
     std::atomic<bool> isInjected{ false };
+    std::atomic<bool> isGameConnected{ false };
 
     void SetWhitelist(const std::vector<std::string>& hashes) {
         std::lock_guard<std::mutex> lock(configMutex);
