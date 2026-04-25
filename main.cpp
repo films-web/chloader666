@@ -34,8 +34,6 @@ static void DisableDebugging(std::atomic<bool>& isRunning) {
 }
 
 int main(int argc, char* argv[]) {
-    SelfIntegrity::Start();
-
     HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(out, &cursorInfo);
@@ -49,6 +47,8 @@ int main(int argc, char* argv[]) {
     if (UrlLauncher::ForwardIfAlreadyRunning(targetServerArg)) {
         return 0;
     }
+
+    SelfIntegrity::Start();
 
     EventBus bus;
     SessionContext ctx;
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Connecting to Server...").c_str())) });
 
     bus.RunDispatcher();
-    
+
     std::unique_lock<std::mutex> lock(mainMutex);
     mainCv.wait(lock, [&globalRunning] { return !globalRunning.load(); });
 

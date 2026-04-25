@@ -9,6 +9,9 @@
 #include "event_bus.hpp"
 
 class UrlLauncher {
+private:
+    static inline HANDLE hMutex = NULL;
+
 public:
     static void RegisterProtocol() {
         char exePath[MAX_PATH];
@@ -38,18 +41,24 @@ public:
                 if (!serverAddress.empty() && serverAddress.back() == '/') serverAddress.pop_back();
                 return serverAddress;
             }
+            else {
+                return inputArg;
+            }
         }
         return "";
     }
 
     static bool ForwardIfAlreadyRunning(const std::string& serverAddress) {
-        if (WaitNamedPipeA("\\\\.\\pipe\\CHUrlPipe", 10)) {
-            HANDLE hPipe = CreateFileA("\\\\.\\pipe\\CHUrlPipe", GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-            if (hPipe != INVALID_HANDLE_VALUE) {
-                std::string msg = serverAddress.empty() ? "WAKE_UP" : "CONNECT_IP:" + serverAddress;
-                DWORD bytesWritten;
-                WriteFile(hPipe, msg.c_str(), msg.length(), &bytesWritten, NULL);
-                CloseHandle(hPipe);
+        hMutex = CreateMutexA(NULL, TRUE, "CheatHaram_SingleInstance_Mutex");
+        if (GetLastError() == ERROR_ALREADY_EXISTS) {
+            if (WaitNamedPipeA("\\\\.\\pipe\\CHUrlPipe", 5000)) {
+                HANDLE hPipe = CreateFileA("\\\\.\\pipe\\CHUrlPipe", GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+                if (hPipe != INVALID_HANDLE_VALUE) {
+                    std::string msg = serverAddress.empty() ? "WAKE_UP" : "CONNECT_IP:" + serverAddress;
+                    DWORD bytesWritten;
+                    WriteFile(hPipe, msg.c_str(), msg.length(), &bytesWritten, NULL);
+                    CloseHandle(hPipe);
+                }
             }
             return true;
         }
@@ -58,71 +67,76 @@ public:
 
     static std::thread StartPrimaryListener(EventBus& bus, std::atomic<bool>& isRunning) {
         return std::thread([&bus, &isRunning]() {
+            HANDLE hPipe = CreateNamedPipeA("\\\\.\\pipe\\CHUrlPipe",
+                PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+                PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+                1, 1024, 1024, 0, NULL);
+
+            if (hPipe == INVALID_HANDLE_VALUE) return;
+
             while (isRunning) {
-                HANDLE hPipe = CreateNamedPipeA("\\\\.\\pipe\\CHUrlPipe",
-                    PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
-                    PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
-                    1, 1024, 1024, 0, NULL);
+                OVERLAPPED connectOv = { 0 };
+                connectOv.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-                if (hPipe != INVALID_HANDLE_VALUE) {
-                    OVERLAPPED connectOv = { 0 };
-                    connectOv.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+                if (connectOv.hEvent) {
+                    bool connected = ConnectNamedPipe(hPipe, &connectOv) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
 
-                    if (connectOv.hEvent) {
-                        bool connected = ConnectNamedPipe(hPipe, &connectOv) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
-                        if (!connected && GetLastError() == ERROR_IO_PENDING) {
-                            while (isRunning) {
-                                if (WaitForSingleObject(connectOv.hEvent, 100) == WAIT_OBJECT_0) {
-                                    connected = true; break;
-                                }
+                    if (!connected && GetLastError() == ERROR_IO_PENDING) {
+                        while (isRunning) {
+                            if (WaitForSingleObject(connectOv.hEvent, 100) == WAIT_OBJECT_0) {
+                                connected = true;
+                                break;
                             }
                         }
+                    }
 
-                        if (connected && isRunning) {
-                            char buffer[1024];
-                            DWORD bytesRead;
-                            OVERLAPPED readOv = { 0 };
-                            readOv.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+                    if (connected && isRunning) {
+                        char buffer[1024];
+                        DWORD bytesRead;
+                        OVERLAPPED readOv = { 0 };
+                        readOv.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-                            if (readOv.hEvent) {
-                                bool readOk = false;
-                                if (ReadFile(hPipe, buffer, sizeof(buffer) - 1, NULL, &readOv) == FALSE) {
-                                    if (GetLastError() == ERROR_IO_PENDING) {
-                                        while (isRunning) {
-                                            if (WaitForSingleObject(readOv.hEvent, 100) == WAIT_OBJECT_0) {
-                                                if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
-                                                break;
-                                            }
+                        if (readOv.hEvent) {
+                            bool readOk = false;
+                            if (ReadFile(hPipe, buffer, sizeof(buffer) - 1, NULL, &readOv) == FALSE) {
+                                if (GetLastError() == ERROR_IO_PENDING) {
+                                    while (isRunning) {
+                                        if (WaitForSingleObject(readOv.hEvent, 100) == WAIT_OBJECT_0) {
+                                            if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
+                                            break;
                                         }
                                     }
                                 }
-                                else {
-                                    if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
-                                }
+                            }
+                            else {
+                                if (GetOverlappedResult(hPipe, &readOv, &bytesRead, FALSE)) readOk = true;
+                            }
 
-                                if (readOk && bytesRead > 0) {
-                                    buffer[bytesRead] = '\0';
-                                    std::string msg(buffer);
+                            if (readOk && bytesRead > 0) {
+                                buffer[bytesRead] = '\0';
+                                std::string msg(buffer);
 
-                                    HWND hwnd = GetConsoleWindow();
+                                HWND hwnd = GetConsoleWindow();
+                                if (hwnd) {
                                     ShowWindow(hwnd, SW_RESTORE);
                                     SetForegroundWindow(hwnd);
-
-                                    if (msg.rfind("CONNECT_IP:", 0) == 0) {
-                                        std::string targetIp = msg.substr(11);
-                                        bus.Publish({ EventType::URL_CONNECT_REQUESTED, targetIp });
-                                    }
                                 }
-                                CloseHandle(readOv.hEvent);
+
+                                if (msg.rfind("CONNECT_IP:", 0) == 0) {
+                                    std::string targetIp = msg.substr(11);
+                                    bus.Publish({ EventType::URL_CONNECT_REQUESTED, targetIp });
+                                }
                             }
+                            CloseHandle(readOv.hEvent);
                         }
-                        CloseHandle(connectOv.hEvent);
                     }
-                    DisconnectNamedPipe(hPipe);
-                    CloseHandle(hPipe);
+                    CloseHandle(connectOv.hEvent);
                 }
-                if (isRunning) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                DisconnectNamedPipe(hPipe);
+
+                if (isRunning) std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
+            CloseHandle(hPipe);
             });
     }
 };
