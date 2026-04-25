@@ -23,3 +23,12 @@ struct CH_Packet {
     unsigned int size;
     unsigned char payload[MAX_PAYLOAD_SIZE + 1];
 };
+
+#pragma pack(push, 1)
+typedef struct {
+    int inGame;
+    int playerNum;
+    char name[64];
+    char server[60];
+} CH_PlayerDataPayload;
+#pragma pack(pop)

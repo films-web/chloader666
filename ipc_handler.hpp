@@ -10,10 +10,19 @@ namespace IPCHandler {
     inline void ProcessMessage(const CH_Packet& pkt, MessageBroker& broker, EventBus& bus) {
         if (pkt.size < 0 || pkt.size > MAX_PAYLOAD_SIZE) return;
 
-        if (pkt.type == CH_INFO_PLAYER_DATA && pkt.size > 0) {
-            std::string data(reinterpret_cast<const char*>(pkt.payload), pkt.size);
-            broker.PushToWS(data);
+        if (pkt.type == CH_INFO_PLAYER_DATA) {
+            if (pkt.size == sizeof(CH_PlayerDataPayload)) {
+                const CH_PlayerDataPayload* data = reinterpret_cast<const CH_PlayerDataPayload*>(pkt.payload);
+                nlohmann::json j;
+                j["action"] = "update_state";
+                j["data"]["name"] = data->name;
+                j["data"]["playerNum"] = data->playerNum;
+                j["data"]["state"] = data->inGame;
+                j["data"]["server"] = data->server;
+                broker.PushToWS(j.dump());
+            }
         }
+
         else if (pkt.type == CH_CMD_REQUEST_PLAYER_LIST) {
             broker.PushToWS(nlohmann::json({ {"action", "get_player_list"} }).dump());
         }
