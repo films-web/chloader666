@@ -32,7 +32,7 @@ private:
         for (char& c : str) { c = std::tolower(static_cast<unsigned char>(c)); }
     }
 
-public:
+private:
     static ScanReport DeepScanPk3(const std::string& filepath) {
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
