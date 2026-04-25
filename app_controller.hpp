@@ -20,7 +20,7 @@ class AppController {
 public:
     static void Register(EventBus& bus, SessionContext& ctx, MessageBroker& broker, IPCServer& ipc, const std::string& root, const std::string& exe) {
 
-        bus.Subscribe(EventType::AUTH_SUCCESS, [&bus, &ctx](const Event&) {
+        bus.Subscribe(EventType::AUTH_SUCCESS, [&bus](const Event&) {
             bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Verifying Files...").c_str())) });
             });
 
@@ -30,12 +30,18 @@ public:
 
         bus.Subscribe(EventType::START_SCAN, [&bus, &ctx, root](const Event&) {
             std::thread([&bus, &ctx, root]() {
-                std::string res = IntegrityScanner::VerifyGameFolder(root, ctx.GetWhitelist());
-                if (!res.empty()) {
-                    bus.Publish({ EventType::SCAN_FAILED, res });
-                }
-                else {
+                ScanReport report = IntegrityScanner::VerifyGameFolder(root, ctx.GetWhitelist());
+
+                switch (report.result) {
+                case ScanResult::CLEAN:
                     bus.Publish({ EventType::SCAN_COMPLETED, std::monostate{} });
+                    break;
+                case ScanResult::INVALID_PATH:
+                    bus.Publish({ EventType::SCAN_FAILED, std::string(PCrypt("Invalid game path.").c_str()) });
+                    break;
+                case ScanResult::HACK_DETECTED:
+                    bus.Publish({ EventType::SCAN_FAILED, report.detectedFile });
+                    break;
                 }
                 }).detach();
             });
@@ -104,7 +110,6 @@ public:
                         std::this_thread::sleep_for(std::chrono::seconds(3));
                         bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                     }
-
                 }
                 else {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Download Failed.").c_str())) });
