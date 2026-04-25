@@ -49,9 +49,10 @@ public:
                 }).detach();
             });
 
-        bus.Subscribe(EventType::SCAN_COMPLETED, [&bus, &ctx](const Event&) {
+        bus.Subscribe(EventType::SCAN_COMPLETED, [&bus, &ctx, &broker](const Event&) {
             if (ctx.isInjected) {
                 bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ACTIVE, std::string(PCrypt("Active").c_str())) });
+                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
             }
             else {
                 bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Starting Game...").c_str())) });
