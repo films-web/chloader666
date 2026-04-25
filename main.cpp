@@ -10,9 +10,9 @@
 #include "event_bus.hpp"
 #include "crypto.hpp"
 #include "hwid.hpp"
-#include "console_ui.hpp" 
-#include "self_integrity.hpp" 
-#include "poly_crypt.hpp"     
+#include "console_ui.hpp"
+#include "self_integrity.hpp"
+#include "poly_crypt.hpp"
 #include "ipc_server.hpp"
 #include "network_client.hpp"
 #include "message_broker.hpp"
@@ -47,8 +47,6 @@ int main(int argc, char* argv[]) {
     if (UrlLauncher::ForwardIfAlreadyRunning(targetServerArg)) {
         return 0;
     }
-
-    SelfIntegrity::Start();
 
     EventBus bus;
     SessionContext ctx;
@@ -100,6 +98,8 @@ int main(int argc, char* argv[]) {
     broker.Start(netClient, ipcServer);
 
     HeartbeatManager::Start(ctx, broker);
+
+    SelfIntegrity::Start();
 
     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Connecting to Server...").c_str())) });
 
