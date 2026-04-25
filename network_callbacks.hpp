@@ -54,6 +54,10 @@ namespace NetworkCallbacks {
 
                 if (isConnected) {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Active").c_str())) });
+                    std::string startupIp = ctx.GetTargetServer();
+                    if (!startupIp.empty()) {
+                        broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_CONNECT_SERVER, "connect " + startupIp + "\n"));
+                    }
                 }
 
                 else {
