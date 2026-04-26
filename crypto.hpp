@@ -13,6 +13,22 @@
 #endif
 
 namespace Crypto {
+
+    inline uint32_t HashFNV(const BYTE* d, size_t s) {
+        uint32_t h = 0x811c9dc5u;
+        for (size_t i = 0; i < s; ++i) { h ^= d[i]; h *= 0x01000193u; }
+        return h;
+    }
+
+    inline uint32_t HashSum(const BYTE* d, size_t s) {
+        uint32_t h = 0u;
+        for (size_t i = 0; i < s; ++i) {
+            h += d[i];
+            h ^= (h << 5) | (h >> 27);
+        }
+        return h;
+    }
+
     inline std::string Base64Encode(const std::vector<unsigned char>& data) {
         static const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         std::string out;
