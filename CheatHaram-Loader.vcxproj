@@ -145,6 +145,7 @@
     <ClCompile Include="miniz.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="anti_debug.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="app_controller.hpp" />
     <ClInclude Include="const_hash.hpp" />
