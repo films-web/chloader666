@@ -11,6 +11,7 @@
 #include "crypto.hpp"
 #include "hwid.hpp"
 #include "console_ui.hpp"
+#include "anti_debug.hpp"
 #include "self_integrity.hpp"
 #include "poly_crypt.hpp"
 #include "ipc_server.hpp"
@@ -21,18 +22,6 @@
 #include "app_controller.hpp"
 #include "heartbeat_manager.hpp"
 
-static void DisableDebugging(std::atomic<bool>& isRunning) {
-    std::thread([&isRunning]() {
-        while (isRunning) {
-            if (IsDebuggerPresent()) TerminateProcess(GetCurrentProcess(), 0xDEAD);
-            BOOL isRemoteDebuggerPresent = FALSE;
-            CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemoteDebuggerPresent);
-            if (isRemoteDebuggerPresent) TerminateProcess(GetCurrentProcess(), 0xDEAD);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-        }).detach();
-}
-
 int main(int argc, char* argv[]) {
     HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
@@ -41,10 +30,16 @@ int main(int argc, char* argv[]) {
     SetConsoleCursorInfo(out, &cursorInfo);
     SetConsoleTitleA("CheatHaram");
 
+    std::atomic<bool> globalRunning{ true };
+    AntiDebug::Start(globalRunning);
+    SelfIntegrity::Start();
+
     UrlLauncher::RegisterProtocol();
     std::string targetServerArg = UrlLauncher::ParseArgument(argc, argv);
 
     if (UrlLauncher::ForwardIfAlreadyRunning(targetServerArg)) {
+        AntiDebug::Stop();
+        SelfIntegrity::Stop();
         return 0;
     }
 
@@ -52,7 +47,6 @@ int main(int argc, char* argv[]) {
     SessionContext ctx;
     ctx.SetTargetServer(targetServerArg);
 
-    std::atomic<bool> globalRunning{ true };
     std::mutex mainMutex;
     std::condition_variable mainCv;
 
@@ -60,8 +54,6 @@ int main(int argc, char* argv[]) {
         globalRunning = false;
         mainCv.notify_all();
         });
-
-    DisableDebugging(globalRunning);
 
     ConsoleUI::Register(bus, ctx);
 
@@ -79,7 +71,6 @@ int main(int argc, char* argv[]) {
     GetModuleFileNameA(NULL, loaderPath, MAX_PATH);
     std::string gameRootFolder = std::filesystem::path(loaderPath).parent_path().string();
     std::string fullExePath = gameRootFolder + "\\" + std::string(Constants::TargetExe().c_str());
-
 
     AppController::Register(bus, ctx, broker, ipcServer, gameRootFolder, fullExePath);
 
@@ -101,9 +92,9 @@ int main(int argc, char* argv[]) {
 
     HeartbeatManager::Start(ctx, broker);
 
-    SelfIntegrity::Start();
-
-    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Connecting to Server...").c_str())) });
+    bus.Publish({ EventType::UI_STATUS_UPDATE,
+        std::make_pair(UiStatusType::LOADING,
+            std::string(PCrypt("Connecting to Server...").c_str())) });
 
     bus.RunDispatcher();
 
@@ -111,10 +102,11 @@ int main(int argc, char* argv[]) {
     mainCv.wait(lock, [&globalRunning] { return !globalRunning.load(); });
 
     HeartbeatManager::Stop();
-    SelfIntegrity::Stop();
-    netClient.Stop();
     broker.Stop();
+    netClient.Stop();
     ipcServer.Stop();
+    SelfIntegrity::Stop();
+    AntiDebug::Stop();
 
     if (urlThread.joinable()) urlThread.join();
 
