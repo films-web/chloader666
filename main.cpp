@@ -23,25 +23,28 @@
 #include "heartbeat_manager.hpp"
 
 int main(int argc, char* argv[]) {
-    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD prev_mode;
+    GetConsoleMode(hInput, &prev_mode);
+    SetConsoleMode(hInput, ENABLE_EXTENDED_FLAGS | (prev_mode & ~ENABLE_QUICK_EDIT_MODE));
+    HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO cursorInfo;
-    GetConsoleCursorInfo(out, &cursorInfo);
+    GetConsoleCursorInfo(hOutput, &cursorInfo);
     cursorInfo.bVisible = false;
-    SetConsoleCursorInfo(out, &cursorInfo);
+    SetConsoleCursorInfo(hOutput, &cursorInfo);
     SetConsoleTitleA("CheatHaram");
 
     std::atomic<bool> globalRunning{ true };
-    AntiDebug::Start(globalRunning);
-    SelfIntegrity::Start();
 
     UrlLauncher::RegisterProtocol();
     std::string targetServerArg = UrlLauncher::ParseArgument(argc, argv);
 
     if (UrlLauncher::ForwardIfAlreadyRunning(targetServerArg)) {
-        AntiDebug::Stop();
-        SelfIntegrity::Stop();
         return 0;
     }
+
+    SelfIntegrity::Start();
+    AntiDebug::Start(globalRunning);
 
     EventBus bus;
     SessionContext ctx;

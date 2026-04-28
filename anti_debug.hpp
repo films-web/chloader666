@@ -7,38 +7,27 @@
 
 class AntiDebug {
 private:
-    // winternl.h exposes an incomplete PEB that is missing NtGlobalFlag and
-    // ProcessHeap. Define the full x86 layout manually instead.
     struct PEB_FULL {
-        BYTE  InheritedAddressSpace;        // 0x00
-        BYTE  ReadImageFileExecOptions;     // 0x01
-        BYTE  BeingDebugged;                // 0x02
-        BYTE  BitField;                     // 0x03
-        PVOID Mutant;                       // 0x04
-        PVOID ImageBaseAddress;             // 0x08
-        PVOID Ldr;                          // 0x0C
-        PVOID ProcessParameters;            // 0x10
-        PVOID SubSystemData;                // 0x14
-        PVOID ProcessHeap;                  // 0x18
-        PVOID FastPebLock;                  // 0x1C
-        PVOID AtlThunkSListPtr;             // 0x20
-        PVOID IFEOKey;                      // 0x24
-        ULONG CrossProcessFlags;            // 0x28
-        PVOID KernelCallbackTable;          // 0x2C
-        ULONG SystemReserved;               // 0x30
-        ULONG AtlThunkSListPtr32;           // 0x34
-        PVOID ApiSetMap;                    // 0x38
-        ULONG TlsExpansionCounter;          // 0x3C
-        PVOID TlsBitmap;                    // 0x40
-        ULONG TlsBitmapBits[2];             // 0x44
-        PVOID ReadOnlySharedMemoryBase;     // 0x4C
-        PVOID SharedData;                   // 0x50
-        PVOID ReadOnlyStaticServerData;     // 0x54
-        PVOID AnsiCodePageData;             // 0x58
-        PVOID OemCodePageData;              // 0x5C
-        PVOID UnicodeCaseTableData;         // 0x60
-        ULONG NumberOfProcessors;           // 0x64
-        ULONG NtGlobalFlag;                 // 0x68
+        BYTE  Reserved1[2];
+        BYTE  BeingDebugged;
+        BYTE  Reserved2[1];
+        PVOID Reserved3[2];
+        PVOID Ldr;
+        PVOID ProcessParameters;
+        PVOID Reserved4[3];
+        PVOID AtlThunkSListPtr;
+        PVOID Reserved5;
+        ULONG Reserved6;
+        PVOID Reserved7;
+        ULONG Reserved8;
+        ULONG AtlThunkSListPtr32;
+        PVOID Reserved9[45];
+        BYTE  Reserved10[96];
+        PVOID PostProcessInitRoutine;
+        BYTE  Reserved11[128];
+        PVOID Reserved12[1];
+        ULONG SessionId;
+        ULONG NtGlobalFlag;
     };
 
     static PEB_FULL* GetPEB() {
@@ -46,14 +35,9 @@ private:
     }
 
     static bool CheckNtGlobalFlag() {
-        return (GetPEB()->NtGlobalFlag & 0x70) != 0;
-    }
-
-    static bool CheckHeapFlags() {
-        PVOID heap = GetPEB()->ProcessHeap;
-        DWORD flags = *(DWORD*)((BYTE*)heap + 0x0C);
-        DWORD forceFlags = *(DWORD*)((BYTE*)heap + 0x10);
-        return ((flags & ~HEAP_GROWABLE) != 0) || (forceFlags != 0);
+        PEB_FULL* peb = GetPEB();
+        if (!peb) return false;
+        return (peb->NtGlobalFlag & 0x70) != 0;
     }
 
     static bool CheckDebuggerPresent() {
@@ -63,25 +47,19 @@ private:
         return isRemote == TRUE;
     }
 
-    static bool CheckOutputDebugString() {
-        SetLastError(0);
-        OutputDebugStringA("x");
-        return GetLastError() == 0;
-    }
-
     static bool CheckHardwareBreakpoints() {
         CONTEXT ctx = {};
         ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-        if (!GetThreadContext(GetCurrentThread(), &ctx)) return false;
-        return (ctx.Dr0 || ctx.Dr1 || ctx.Dr2 || ctx.Dr3);
+        HANDLE hThread = GetCurrentThread();
+        if (!GetThreadContext(hThread, &ctx)) return false;
+
+        return (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0);
     }
 
     static bool IsBeingDebugged() {
         return CheckDebuggerPresent()
-            || CheckNtGlobalFlag()
-            || CheckHeapFlags()
             || CheckHardwareBreakpoints()
-            || CheckOutputDebugString();
+            || CheckNtGlobalFlag();
     }
 
     [[noreturn]] static void Terminate() {
