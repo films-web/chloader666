@@ -8,10 +8,11 @@
 #include <vector>
 
 #include "crypto.hpp"
+#include "poly_crypt.hpp"
 
 class HWIDManager {
 public:
-    static std::string Generate() {
+    static __forceinline std::string Generate() {
         std::stringstream ss;
         ss << GetCPUId()
             << GetWindowsProductId()
@@ -21,7 +22,7 @@ public:
     }
 
 private:
-    static std::string GetCPUId() {
+    static __forceinline std::string GetCPUId() {
         int info[4] = { 0 };
         __cpuid(info, 1);
         std::stringstream ss;
@@ -31,28 +32,31 @@ private:
         return ss.str();
     }
 
-    static std::string GetWindowsProductId() {
+    static __forceinline std::string GetWindowsProductId() {
         char value[256] = { 0 };
         DWORD size = sizeof(value);
         HKEY hKey;
+        // ENCRYPTED: Registry Path
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE,
-            "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+            PCrypt("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion").c_str(),
             0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-            RegQueryValueExA(hKey, "ProductId", nullptr, nullptr,
+
+            // ENCRYPTED: Registry Key
+            RegQueryValueExA(hKey, PCrypt("ProductId").c_str(), nullptr, nullptr,
                 reinterpret_cast<LPBYTE>(value), &size);
             RegCloseKey(hKey);
             return std::string(value);
         }
-        return "NOPID";
+        return PCrypt("NOPID").c_str();
     }
 
-    static std::string GetMotherboardSerial() {
+    static __forceinline std::string GetMotherboardSerial() {
         DWORD size = GetSystemFirmwareTable('RSMB', 0, nullptr, 0);
-        if (size == 0) return "NOMB";
+        if (size == 0) return PCrypt("NOMB").c_str();
 
         std::vector<BYTE> buf(size);
         if (GetSystemFirmwareTable('RSMB', 0, buf.data(), size) == 0)
-            return "NOMB";
+            return PCrypt("NOMB").c_str();
 
         BYTE* p = buf.data() + 8;
         BYTE* end = buf.data() + size;
@@ -71,7 +75,7 @@ private:
                     if (str < reinterpret_cast<const char*>(end) && strlen(str) > 0)
                         return std::string(str);
                 }
-                return "NOMB";
+                return PCrypt("NOMB").c_str();
             }
 
             p += length;
@@ -79,6 +83,6 @@ private:
             p += 2;
         }
 
-        return "NOMB";
+        return PCrypt("NOMB").c_str();
     }
 };
