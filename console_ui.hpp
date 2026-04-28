@@ -18,7 +18,7 @@ namespace ConsoleUI {
         GetConsoleCursorInfo(hOutput, &cursorInfo);
         cursorInfo.bVisible = false;
         SetConsoleCursorInfo(hOutput, &cursorInfo);
-        SetConsoleTitleA("CheatHaram");
+        SetConsoleTitleA(PCrypt("CheatHaram").c_str());
     }
 
     inline void Register(EventBus& bus, SessionContext& ctx) {
