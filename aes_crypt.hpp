@@ -13,7 +13,7 @@
 
 class AESCrypt {
 public:
-    static std::string Encrypt(const std::string& plaintext, const std::string& keyStr) {
+    static __forceinline std::string Encrypt(const std::string& plaintext, const std::string& keyStr) {
         BCRYPT_ALG_HANDLE hAlg = NULL;
         BCRYPT_KEY_HANDLE hKey = NULL;
         DWORD cbData = 0, cbKeyObject = 0, cbBlockLen = 0;
@@ -55,7 +55,7 @@ public:
         return result;
     }
 
-    static std::string Decrypt(const std::string& b64Payload, const std::string& keyStr) {
+    static __forceinline std::string Decrypt(const std::string& b64Payload, const std::string& keyStr) {
         std::vector<BYTE> rawData = Crypto::Base64Decode(b64Payload);
         if (rawData.size() <= 16) return "";
 
