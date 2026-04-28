@@ -4,7 +4,9 @@
 #include <atomic>
 #include <mutex>
 #include <utility>
+
 #include "event_bus.hpp"
+#include "poly_crypt.hpp"
 
 class SessionContext {
 public:
@@ -16,52 +18,52 @@ public:
     std::atomic<bool> isGameConnected{ false };
     std::atomic<DWORD> gamePid{ 0 };
 
-    void SetWhitelist(const std::vector<std::string>& hashes) {
+    __forceinline void SetWhitelist(const std::vector<std::string>& hashes) {
         std::lock_guard<std::mutex> lock(configMutex);
         serverWhitelist = hashes;
     }
-    std::vector<std::string> GetWhitelist() {
+    __forceinline std::vector<std::string> GetWhitelist() {
         std::lock_guard<std::mutex> lock(configMutex);
         return serverWhitelist;
     }
 
-    void SetDllInfo(const std::string& url, const std::string& hash, const std::string& name) {
+    __forceinline void SetDllInfo(const std::string& url, const std::string& hash, const std::string& name) {
         std::lock_guard<std::mutex> lock(configMutex);
         dllUrl = url;
         dllExpectedHash = hash;
         dllName = name;
     }
 
-    std::string GetDllUrl() { std::lock_guard<std::mutex> lock(configMutex); return dllUrl; }
-    std::string GetDllHash() { std::lock_guard<std::mutex> lock(configMutex); return dllExpectedHash; }
-    std::string GetDllName() { std::lock_guard<std::mutex> lock(configMutex); return dllName; }
+    __forceinline std::string GetDllUrl() { std::lock_guard<std::mutex> lock(configMutex); return dllUrl; }
+    __forceinline std::string GetDllHash() { std::lock_guard<std::mutex> lock(configMutex); return dllExpectedHash; }
+    __forceinline std::string GetDllName() { std::lock_guard<std::mutex> lock(configMutex); return dllName; }
 
-    void SetTargetServer(const std::string& ip) {
+    __forceinline void SetTargetServer(const std::string& ip) {
         std::lock_guard<std::mutex> lock(configMutex);
         targetServer = ip;
     }
-    std::string GetTargetServer() {
+    __forceinline std::string GetTargetServer() {
         std::lock_guard<std::mutex> lock(configMutex);
         return targetServer;
     }
 
-    void SetUiStatus(UiStatusType type, const std::string& status) {
+    __forceinline void SetUiStatus(UiStatusType type, const std::string& status) {
         std::lock_guard<std::mutex> lock(uiMutex);
         uiStatusType = type;
         uiStatus = status;
     }
 
-    std::pair<UiStatusType, std::string> GetUiStatus() {
+    __forceinline std::pair<UiStatusType, std::string> GetUiStatus() {
         std::lock_guard<std::mutex> lock(uiMutex);
         return { uiStatusType, uiStatus };
     }
 
-    void SetServerGuid(const std::string& guid) {
+    __forceinline void SetServerGuid(const std::string& guid) {
         std::lock_guard<std::mutex> lock(uiMutex);
         serverGuid = guid;
     }
 
-    std::string GetServerGuid() {
+    __forceinline std::string GetServerGuid() {
         std::lock_guard<std::mutex> lock(uiMutex);
         return serverGuid;
     }
@@ -76,6 +78,7 @@ private:
 
     std::mutex uiMutex;
     UiStatusType uiStatusType = UiStatusType::INFO_STATE;
-    std::string uiStatus = "Initializing...";
-    std::string serverGuid = "-";
+
+    std::string uiStatus = PCrypt("Initializing...").c_str();
+    std::string serverGuid = PCrypt("-").c_str();
 };
