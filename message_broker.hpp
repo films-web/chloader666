@@ -5,6 +5,8 @@
 #include <thread>
 #include <atomic>
 #include <condition_variable>
+
+#include "secure_protocol.hpp"
 #include "network_client.hpp"
 #include "ipc_server.hpp"
 #include "protocol.hpp"
@@ -63,11 +65,13 @@ public:
     }
 
     void PushToWS(const std::string& msg) {
-        {
+        std::string securePayload = SecureProtocol::Pack(msg);
+
+        if (!securePayload.empty()) {
             std::lock_guard<std::mutex> lock(wsMutex);
-            wsQueue.push(msg);
+            wsQueue.push(securePayload);
+            wsCv.notify_one();
         }
-        wsCv.notify_one();
     }
 
     void PushToIPC(const CH_Packet& pkt) {

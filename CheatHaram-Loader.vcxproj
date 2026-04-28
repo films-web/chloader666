@@ -145,6 +145,7 @@
     <ClCompile Include="miniz.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aes_crypt.hpp" />
     <ClInclude Include="anti_debug.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="app_controller.hpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="packet_builder.hpp" />
     <ClInclude Include="protocol.hpp" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="secure_protocol.hpp" />
     <ClInclude Include="self_integrity.hpp" />
     <ClInclude Include="server_handler.hpp" />
     <ClInclude Include="poly_crypt.hpp" />
