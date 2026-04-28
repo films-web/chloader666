@@ -7,7 +7,7 @@
 #include <string>
 
 namespace IPCHandler {
-    inline void ProcessMessage(const CH_Packet& pkt, MessageBroker& broker, EventBus& bus) {
+    static __forceinline void ProcessMessage(const CH_Packet& pkt, MessageBroker& broker, EventBus& bus) {
         if (pkt.size < 0 || pkt.size > MAX_PAYLOAD_SIZE) return;
 
         if (pkt.type == CH_INFO_PLAYER_DATA) {
