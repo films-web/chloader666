@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <utility>
-#include "json.hpp"
 #include "event_bus.hpp"
 #include "session_context.hpp"
 #include "network_client.hpp"
@@ -11,27 +10,23 @@
 #include "ipc_handler.hpp"
 #include "constants.hpp"
 #include "poly_crypt.hpp"
-
-using json = nlohmann::json;
+#include "messages.pb.h"
 
 namespace NetworkCallbacks {
     inline void Register(EventBus& bus, SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker,
-        const std::string& hwid, const std::string& signature) {
+        const std::string& signature) {
 
         netClient.Start(std::string(Constants::WsUrl().c_str()),
-            [&bus, &broker, hwid, signature](bool isConnected, const std::string& errorMsg) {
+            [&bus, &broker, signature](bool isConnected, const std::string& errorMsg) {
                 broker.SetNetworkStatus(isConnected);
+
                 if (isConnected) {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Authenticating...").c_str())) });
+                    CheatHaram::C2S_Message authMsg;
+                    authMsg.set_action(CheatHaram::ActionType::AUTH_REQUEST);
+                    authMsg.set_signature(signature);
 
-                    json authPayload = {
-                        {"action", "auth"},
-                        {"data", {
-                            {"hwid", hwid},
-                            {"signature", signature},
-                        }}
-                    };
-                    broker.PushToWS(authPayload.dump());
+                    broker.PushToWS(authMsg);
                 }
                 else {
                     std::string msg = errorMsg.empty() ? std::string(PCrypt("Disconnected.").c_str()) : std::string(PCrypt("Net Error: ").c_str()) + errorMsg;
@@ -59,7 +54,6 @@ namespace NetworkCallbacks {
                         broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_CONNECT_SERVER, "connect " + startupIp + "\n"));
                     }
                 }
-
                 else {
                     if (ctx.isInjected) {
                         bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Game Disconnected.").c_str())) });
