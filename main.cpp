@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     std::string hardwareId = HWIDManager::Generate();
     std::string generatedSignature = Crypto::GenerateSHA256Key(
         hardwareId,
-        PCrypt("baf0f0e65f1b2688b8d99cb628d21c9a07e8992174fe2f9cfc15cef7f92a6fb9").c_str()
+        Constants::ClientSecret().c_str()
     );
 
     IPCServer ipcServer;
