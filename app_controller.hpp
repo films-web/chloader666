@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cctype>
 #include <utility>
-
 #include "event_bus.hpp"
 #include "session_context.hpp"
 #include "message_broker.hpp"
@@ -17,6 +16,16 @@
 #include "crypto.hpp"
 
 class AppController {
+private:
+    struct ScopedFileDeleter {
+        std::string filepath;
+        ~ScopedFileDeleter() {
+            if (!filepath.empty()) {
+                DeleteFileA(filepath.c_str());
+            }
+        }
+    };
+
 public:
     static void Register(EventBus& bus, SessionContext& ctx, MessageBroker& broker, IPCServer& ipc, const std::string& root, const std::string& exe) {
 
@@ -82,6 +91,9 @@ public:
                 bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Downloading Payload...").c_str())) });
 
                 if (Downloader::DownloadHttps(ctx.GetDllUrl(), p)) {
+
+                    ScopedFileDeleter cleaner{ targetPathStr };
+
                     std::string expectedHash = ctx.GetDllHash();
                     std::string actualHash = Crypto::CalculateSHA256File(p);
 
@@ -94,19 +106,19 @@ public:
                     if (hashMatches) {
                         bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Injecting...").c_str())) });
 
-                        if (Injector::LaunchAndInject(exe, p)) {
-                            DeleteFileA(p);
+                        DWORD pid = Injector::LaunchAndInject(exe, p);
+
+                        if (pid != 0) {
+                            ctx.gamePid = pid;
                             bus.Publish({ EventType::INJECTION_SUCCESS, std::monostate{} });
                         }
                         else {
-                            DeleteFileA(p);
                             bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Injection Failed.").c_str())) });
                             std::this_thread::sleep_for(std::chrono::seconds(3));
                             bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                         }
                     }
                     else {
-                        DeleteFileA(p);
                         bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Payload Hash Mismatch!").c_str())) });
                         std::this_thread::sleep_for(std::chrono::seconds(3));
                         bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
@@ -122,14 +134,18 @@ public:
 
         bus.Subscribe(EventType::INJECTION_SUCCESS, [&bus, &ctx](const Event&) {
             ctx.isInjected = true;
-            DWORD pid = Injector::GetProcessIdByName(Constants::TargetExe().c_str());
-            DllIntegrity::Start(pid, ctx.GetDllName());
-            std::thread([&bus, &ctx]() {
-                while (Injector::GetProcessIdByName(Constants::TargetExe().c_str()) != 0) {
+            DWORD activePid = ctx.gamePid.load();
+
+            DllIntegrity::Start(activePid, ctx.GetDllName());
+
+            std::thread([&bus, &ctx, activePid]() {
+                while (Injector::IsProcessRunning(activePid)) {
                     std::this_thread::sleep_for(std::chrono::seconds(1));
                 }
+
                 DllIntegrity::Stop();
                 ctx.isInjected = false;
+                ctx.gamePid = 0;
                 bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
                 }).detach();
             });
