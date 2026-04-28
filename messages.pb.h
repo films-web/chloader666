@@ -744,9 +744,9 @@ class S2C_Message final : public ::google::protobuf::Message
     kPlayersListFieldNumber = 9,
     kMessageFieldNumber = 3,
     kGuidFieldNumber = 4,
-    kPayloadUrlFieldNumber = 6,
-    kPayloadHashFieldNumber = 7,
-    kPayloadNameFieldNumber = 8,
+    kDllBytesFieldNumber = 6,
+    kDllHashFieldNumber = 7,
+    kDllNameFieldNumber = 8,
     kActionFieldNumber = 1,
     kSuccessFieldNumber = 2,
   };
@@ -819,49 +819,49 @@ class S2C_Message final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_guid();
 
   public:
-  // string payload_url = 6;
-  void clear_payload_url() ;
-  const ::std::string& payload_url() const;
+  // string dll_bytes = 6;
+  void clear_dll_bytes() ;
+  const ::std::string& dll_bytes() const;
   template <typename Arg_ = const ::std::string&, typename... Args_>
-  void set_payload_url(Arg_&& arg, Args_... args);
-  ::std::string* PROTOBUF_NONNULL mutable_payload_url();
-  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_payload_url();
-  void set_allocated_payload_url(::std::string* PROTOBUF_NULLABLE value);
+  void set_dll_bytes(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_dll_bytes();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_dll_bytes();
+  void set_allocated_dll_bytes(::std::string* PROTOBUF_NULLABLE value);
 
   private:
-  const ::std::string& _internal_payload_url() const;
-  PROTOBUF_ALWAYS_INLINE void _internal_set_payload_url(const ::std::string& value);
-  ::std::string* PROTOBUF_NONNULL _internal_mutable_payload_url();
+  const ::std::string& _internal_dll_bytes() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_dll_bytes(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_dll_bytes();
 
   public:
-  // string payload_hash = 7;
-  void clear_payload_hash() ;
-  const ::std::string& payload_hash() const;
+  // string dll_hash = 7;
+  void clear_dll_hash() ;
+  const ::std::string& dll_hash() const;
   template <typename Arg_ = const ::std::string&, typename... Args_>
-  void set_payload_hash(Arg_&& arg, Args_... args);
-  ::std::string* PROTOBUF_NONNULL mutable_payload_hash();
-  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_payload_hash();
-  void set_allocated_payload_hash(::std::string* PROTOBUF_NULLABLE value);
+  void set_dll_hash(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_dll_hash();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_dll_hash();
+  void set_allocated_dll_hash(::std::string* PROTOBUF_NULLABLE value);
 
   private:
-  const ::std::string& _internal_payload_hash() const;
-  PROTOBUF_ALWAYS_INLINE void _internal_set_payload_hash(const ::std::string& value);
-  ::std::string* PROTOBUF_NONNULL _internal_mutable_payload_hash();
+  const ::std::string& _internal_dll_hash() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_dll_hash(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_dll_hash();
 
   public:
-  // string payload_name = 8;
-  void clear_payload_name() ;
-  const ::std::string& payload_name() const;
+  // string dll_name = 8;
+  void clear_dll_name() ;
+  const ::std::string& dll_name() const;
   template <typename Arg_ = const ::std::string&, typename... Args_>
-  void set_payload_name(Arg_&& arg, Args_... args);
-  ::std::string* PROTOBUF_NONNULL mutable_payload_name();
-  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_payload_name();
-  void set_allocated_payload_name(::std::string* PROTOBUF_NULLABLE value);
+  void set_dll_name(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_dll_name();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_dll_name();
+  void set_allocated_dll_name(::std::string* PROTOBUF_NULLABLE value);
 
   private:
-  const ::std::string& _internal_payload_name() const;
-  PROTOBUF_ALWAYS_INLINE void _internal_set_payload_name(const ::std::string& value);
-  ::std::string* PROTOBUF_NONNULL _internal_mutable_payload_name();
+  const ::std::string& _internal_dll_name() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_dll_name(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_dll_name();
 
   public:
   // .CheatHaram.ActionType action = 1;
@@ -889,7 +889,7 @@ class S2C_Message final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<4, 9,
-                                   1, 91,
+                                   1, 81,
                                    2>
       _table_;
 
@@ -914,9 +914,9 @@ class S2C_Message final : public ::google::protobuf::Message
     ::google::protobuf::RepeatedPtrField< ::CheatHaram::Player > players_list_;
     ::google::protobuf::internal::ArenaStringPtr message_;
     ::google::protobuf::internal::ArenaStringPtr guid_;
-    ::google::protobuf::internal::ArenaStringPtr payload_url_;
-    ::google::protobuf::internal::ArenaStringPtr payload_hash_;
-    ::google::protobuf::internal::ArenaStringPtr payload_name_;
+    ::google::protobuf::internal::ArenaStringPtr dll_bytes_;
+    ::google::protobuf::internal::ArenaStringPtr dll_hash_;
+    ::google::protobuf::internal::ArenaStringPtr dll_name_;
     int action_;
     bool success_;
     PROTOBUF_TSAN_DECLARE_MEMBER
@@ -2156,199 +2156,199 @@ S2C_Message::_internal_mutable_hashes() {
   return &_impl_.hashes_;
 }
 
-// string payload_url = 6;
-inline void S2C_Message::clear_payload_url() {
+// string dll_bytes = 6;
+inline void S2C_Message::clear_dll_bytes() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.payload_url_.ClearToEmpty();
+  _impl_.dll_bytes_.ClearToEmpty();
   ClearHasBit(_impl_._has_bits_[0],
                   0x00000010U);
 }
-inline const ::std::string& S2C_Message::payload_url() const
+inline const ::std::string& S2C_Message::dll_bytes() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:CheatHaram.S2C_Message.payload_url)
-  return _internal_payload_url();
+  // @@protoc_insertion_point(field_get:CheatHaram.S2C_Message.dll_bytes)
+  return _internal_dll_bytes();
 }
 template <typename Arg_, typename... Args_>
-PROTOBUF_ALWAYS_INLINE void S2C_Message::set_payload_url(Arg_&& arg, Args_... args) {
+PROTOBUF_ALWAYS_INLINE void S2C_Message::set_dll_bytes(Arg_&& arg, Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   SetHasBit(_impl_._has_bits_[0], 0x00000010U);
-  _impl_.payload_url_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.payload_url)
+  _impl_.dll_bytes_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.dll_bytes)
 }
-inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_payload_url()
+inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_dll_bytes()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   SetHasBit(_impl_._has_bits_[0], 0x00000010U);
-  ::std::string* _s = _internal_mutable_payload_url();
-  // @@protoc_insertion_point(field_mutable:CheatHaram.S2C_Message.payload_url)
+  ::std::string* _s = _internal_mutable_dll_bytes();
+  // @@protoc_insertion_point(field_mutable:CheatHaram.S2C_Message.dll_bytes)
   return _s;
 }
-inline const ::std::string& S2C_Message::_internal_payload_url() const {
+inline const ::std::string& S2C_Message::_internal_dll_bytes() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.payload_url_.Get();
+  return _impl_.dll_bytes_.Get();
 }
-inline void S2C_Message::_internal_set_payload_url(const ::std::string& value) {
+inline void S2C_Message::_internal_set_dll_bytes(const ::std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.payload_url_.Set(value, GetArena());
+  _impl_.dll_bytes_.Set(value, GetArena());
 }
-inline ::std::string* PROTOBUF_NONNULL S2C_Message::_internal_mutable_payload_url() {
+inline ::std::string* PROTOBUF_NONNULL S2C_Message::_internal_mutable_dll_bytes() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.payload_url_.Mutable( GetArena());
+  return _impl_.dll_bytes_.Mutable( GetArena());
 }
-inline ::std::string* PROTOBUF_NULLABLE S2C_Message::release_payload_url() {
+inline ::std::string* PROTOBUF_NULLABLE S2C_Message::release_dll_bytes() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:CheatHaram.S2C_Message.payload_url)
+  // @@protoc_insertion_point(field_release:CheatHaram.S2C_Message.dll_bytes)
   if (!CheckHasBit(_impl_._has_bits_[0], 0x00000010U)) {
     return nullptr;
   }
   ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
-  auto* released = _impl_.payload_url_.Release();
+  auto* released = _impl_.dll_bytes_.Release();
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
-    _impl_.payload_url_.Set("", GetArena());
+    _impl_.dll_bytes_.Set("", GetArena());
   }
   return released;
 }
-inline void S2C_Message::set_allocated_payload_url(::std::string* PROTOBUF_NULLABLE value) {
+inline void S2C_Message::set_allocated_dll_bytes(::std::string* PROTOBUF_NULLABLE value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (value != nullptr) {
     SetHasBit(_impl_._has_bits_[0], 0x00000010U);
   } else {
     ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
   }
-  _impl_.payload_url_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.payload_url_.IsDefault()) {
-    _impl_.payload_url_.Set("", GetArena());
+  _impl_.dll_bytes_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.dll_bytes_.IsDefault()) {
+    _impl_.dll_bytes_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:CheatHaram.S2C_Message.payload_url)
+  // @@protoc_insertion_point(field_set_allocated:CheatHaram.S2C_Message.dll_bytes)
 }
 
-// string payload_hash = 7;
-inline void S2C_Message::clear_payload_hash() {
+// string dll_hash = 7;
+inline void S2C_Message::clear_dll_hash() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.payload_hash_.ClearToEmpty();
+  _impl_.dll_hash_.ClearToEmpty();
   ClearHasBit(_impl_._has_bits_[0],
                   0x00000020U);
 }
-inline const ::std::string& S2C_Message::payload_hash() const
+inline const ::std::string& S2C_Message::dll_hash() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:CheatHaram.S2C_Message.payload_hash)
-  return _internal_payload_hash();
+  // @@protoc_insertion_point(field_get:CheatHaram.S2C_Message.dll_hash)
+  return _internal_dll_hash();
 }
 template <typename Arg_, typename... Args_>
-PROTOBUF_ALWAYS_INLINE void S2C_Message::set_payload_hash(Arg_&& arg, Args_... args) {
+PROTOBUF_ALWAYS_INLINE void S2C_Message::set_dll_hash(Arg_&& arg, Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   SetHasBit(_impl_._has_bits_[0], 0x00000020U);
-  _impl_.payload_hash_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.payload_hash)
+  _impl_.dll_hash_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.dll_hash)
 }
-inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_payload_hash()
+inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_dll_hash()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   SetHasBit(_impl_._has_bits_[0], 0x00000020U);
-  ::std::string* _s = _internal_mutable_payload_hash();
-  // @@protoc_insertion_point(field_mutable:CheatHaram.S2C_Message.payload_hash)
+  ::std::string* _s = _internal_mutable_dll_hash();
+  // @@protoc_insertion_point(field_mutable:CheatHaram.S2C_Message.dll_hash)
   return _s;
 }
-inline const ::std::string& S2C_Message::_internal_payload_hash() const {
+inline const ::std::string& S2C_Message::_internal_dll_hash() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.payload_hash_.Get();
+  return _impl_.dll_hash_.Get();
 }
-inline void S2C_Message::_internal_set_payload_hash(const ::std::string& value) {
+inline void S2C_Message::_internal_set_dll_hash(const ::std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.payload_hash_.Set(value, GetArena());
+  _impl_.dll_hash_.Set(value, GetArena());
 }
-inline ::std::string* PROTOBUF_NONNULL S2C_Message::_internal_mutable_payload_hash() {
+inline ::std::string* PROTOBUF_NONNULL S2C_Message::_internal_mutable_dll_hash() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.payload_hash_.Mutable( GetArena());
+  return _impl_.dll_hash_.Mutable( GetArena());
 }
-inline ::std::string* PROTOBUF_NULLABLE S2C_Message::release_payload_hash() {
+inline ::std::string* PROTOBUF_NULLABLE S2C_Message::release_dll_hash() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:CheatHaram.S2C_Message.payload_hash)
+  // @@protoc_insertion_point(field_release:CheatHaram.S2C_Message.dll_hash)
   if (!CheckHasBit(_impl_._has_bits_[0], 0x00000020U)) {
     return nullptr;
   }
   ClearHasBit(_impl_._has_bits_[0], 0x00000020U);
-  auto* released = _impl_.payload_hash_.Release();
+  auto* released = _impl_.dll_hash_.Release();
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
-    _impl_.payload_hash_.Set("", GetArena());
+    _impl_.dll_hash_.Set("", GetArena());
   }
   return released;
 }
-inline void S2C_Message::set_allocated_payload_hash(::std::string* PROTOBUF_NULLABLE value) {
+inline void S2C_Message::set_allocated_dll_hash(::std::string* PROTOBUF_NULLABLE value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (value != nullptr) {
     SetHasBit(_impl_._has_bits_[0], 0x00000020U);
   } else {
     ClearHasBit(_impl_._has_bits_[0], 0x00000020U);
   }
-  _impl_.payload_hash_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.payload_hash_.IsDefault()) {
-    _impl_.payload_hash_.Set("", GetArena());
+  _impl_.dll_hash_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.dll_hash_.IsDefault()) {
+    _impl_.dll_hash_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:CheatHaram.S2C_Message.payload_hash)
+  // @@protoc_insertion_point(field_set_allocated:CheatHaram.S2C_Message.dll_hash)
 }
 
-// string payload_name = 8;
-inline void S2C_Message::clear_payload_name() {
+// string dll_name = 8;
+inline void S2C_Message::clear_dll_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.payload_name_.ClearToEmpty();
+  _impl_.dll_name_.ClearToEmpty();
   ClearHasBit(_impl_._has_bits_[0],
                   0x00000040U);
 }
-inline const ::std::string& S2C_Message::payload_name() const
+inline const ::std::string& S2C_Message::dll_name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:CheatHaram.S2C_Message.payload_name)
-  return _internal_payload_name();
+  // @@protoc_insertion_point(field_get:CheatHaram.S2C_Message.dll_name)
+  return _internal_dll_name();
 }
 template <typename Arg_, typename... Args_>
-PROTOBUF_ALWAYS_INLINE void S2C_Message::set_payload_name(Arg_&& arg, Args_... args) {
+PROTOBUF_ALWAYS_INLINE void S2C_Message::set_dll_name(Arg_&& arg, Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   SetHasBit(_impl_._has_bits_[0], 0x00000040U);
-  _impl_.payload_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.payload_name)
+  _impl_.dll_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.dll_name)
 }
-inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_payload_name()
+inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_dll_name()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   SetHasBit(_impl_._has_bits_[0], 0x00000040U);
-  ::std::string* _s = _internal_mutable_payload_name();
-  // @@protoc_insertion_point(field_mutable:CheatHaram.S2C_Message.payload_name)
+  ::std::string* _s = _internal_mutable_dll_name();
+  // @@protoc_insertion_point(field_mutable:CheatHaram.S2C_Message.dll_name)
   return _s;
 }
-inline const ::std::string& S2C_Message::_internal_payload_name() const {
+inline const ::std::string& S2C_Message::_internal_dll_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.payload_name_.Get();
+  return _impl_.dll_name_.Get();
 }
-inline void S2C_Message::_internal_set_payload_name(const ::std::string& value) {
+inline void S2C_Message::_internal_set_dll_name(const ::std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.payload_name_.Set(value, GetArena());
+  _impl_.dll_name_.Set(value, GetArena());
 }
-inline ::std::string* PROTOBUF_NONNULL S2C_Message::_internal_mutable_payload_name() {
+inline ::std::string* PROTOBUF_NONNULL S2C_Message::_internal_mutable_dll_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.payload_name_.Mutable( GetArena());
+  return _impl_.dll_name_.Mutable( GetArena());
 }
-inline ::std::string* PROTOBUF_NULLABLE S2C_Message::release_payload_name() {
+inline ::std::string* PROTOBUF_NULLABLE S2C_Message::release_dll_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:CheatHaram.S2C_Message.payload_name)
+  // @@protoc_insertion_point(field_release:CheatHaram.S2C_Message.dll_name)
   if (!CheckHasBit(_impl_._has_bits_[0], 0x00000040U)) {
     return nullptr;
   }
   ClearHasBit(_impl_._has_bits_[0], 0x00000040U);
-  auto* released = _impl_.payload_name_.Release();
+  auto* released = _impl_.dll_name_.Release();
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
-    _impl_.payload_name_.Set("", GetArena());
+    _impl_.dll_name_.Set("", GetArena());
   }
   return released;
 }
-inline void S2C_Message::set_allocated_payload_name(::std::string* PROTOBUF_NULLABLE value) {
+inline void S2C_Message::set_allocated_dll_name(::std::string* PROTOBUF_NULLABLE value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (value != nullptr) {
     SetHasBit(_impl_._has_bits_[0], 0x00000040U);
   } else {
     ClearHasBit(_impl_._has_bits_[0], 0x00000040U);
   }
-  _impl_.payload_name_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.payload_name_.IsDefault()) {
-    _impl_.payload_name_.Set("", GetArena());
+  _impl_.dll_name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.dll_name_.IsDefault()) {
+    _impl_.dll_name_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:CheatHaram.S2C_Message.payload_name)
+  // @@protoc_insertion_point(field_set_allocated:CheatHaram.S2C_Message.dll_name)
 }
 
 // repeated .CheatHaram.Player players_list = 9;

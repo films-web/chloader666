@@ -100,13 +100,13 @@ inline constexpr S2C_Message::Impl_::Impl_(
         guid_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        payload_url_(
+        dll_bytes_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        payload_hash_(
+        dll_hash_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
-        payload_name_(
+        dll_name_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
         action_{static_cast< ::CheatHaram::ActionType >(0)},
@@ -218,9 +218,9 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.message_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.guid_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.hashes_),
-        PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.payload_url_),
-        PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.payload_hash_),
-        PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.payload_name_),
+        PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.dll_bytes_),
+        PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.dll_hash_),
+        PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.dll_name_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_.players_list_),
         7,
         8,
@@ -256,27 +256,26 @@ const char descriptor_table_protodef_messages_2eproto[] ABSL_ATTRIBUTE_SECTION_V
     "ActionType\022\021\n\ttimestamp\030\002 \001(\004\022\021\n\tsignatu"
     "re\030\003 \001(\t\022+\n\013player_data\030\004 \001(\0132\026.CheatHar"
     "am.PlayerData\022\022\n\nimage_data\030\005 \001(\014\022\016\n\006tar"
-    "get\030\006 \001(\t\"\340\001\n\013S2C_Message\022&\n\006action\030\001 \001("
+    "get\030\006 \001(\t\"\326\001\n\013S2C_Message\022&\n\006action\030\001 \001("
     "\0162\026.CheatHaram.ActionType\022\017\n\007success\030\002 \001"
     "(\010\022\017\n\007message\030\003 \001(\t\022\014\n\004guid\030\004 \001(\t\022\016\n\006has"
-    "hes\030\005 \003(\t\022\023\n\013payload_url\030\006 \001(\t\022\024\n\014payloa"
-    "d_hash\030\007 \001(\t\022\024\n\014payload_name\030\010 \001(\t\022(\n\014pl"
-    "ayers_list\030\t \003(\0132\022.CheatHaram.Player*\302\002\n"
-    "\nActionType\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQUEST"
-    "\020\001\022\017\n\013AUTH_RESULT\020\002\022\025\n\021PK3_WHITELIST_REQ"
-    "\020\003\022\030\n\024PK3_WHITELIST_RESULT\020\004\022\017\n\013PAYLOAD_"
-    "REQ\020\005\022\022\n\016PAYLOAD_RESULT\020\006\022\014\n\010SET_GUID\020\007\022"
-    "\020\n\014CRASH_CLIENT\020\010\022\023\n\017PLAYER_LIST_REQ\020\t\022\026"
-    "\n\022PLAYER_LIST_RESULT\020\n\022\021\n\rTAKE_FAIRSHOT\020"
-    "\013\022\024\n\020REQUEST_FAIRSHOT\020\014\022\r\n\tHEARTBEAT\020\r\022\027"
-    "\n\023UPDATE_PLAYER_STATE\020\016\022\020\n\014GET_GUID_REQ\020"
-    "\017b\006proto3"
+    "hes\030\005 \003(\t\022\021\n\tdll_bytes\030\006 \001(\t\022\020\n\010dll_hash"
+    "\030\007 \001(\t\022\020\n\010dll_name\030\010 \001(\t\022(\n\014players_list"
+    "\030\t \003(\0132\022.CheatHaram.Player*\302\002\n\nActionTyp"
+    "e\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQUEST\020\001\022\017\n\013AUTH"
+    "_RESULT\020\002\022\025\n\021PK3_WHITELIST_REQ\020\003\022\030\n\024PK3_"
+    "WHITELIST_RESULT\020\004\022\017\n\013PAYLOAD_REQ\020\005\022\022\n\016P"
+    "AYLOAD_RESULT\020\006\022\014\n\010SET_GUID\020\007\022\020\n\014CRASH_C"
+    "LIENT\020\010\022\023\n\017PLAYER_LIST_REQ\020\t\022\026\n\022PLAYER_L"
+    "IST_RESULT\020\n\022\021\n\rTAKE_FAIRSHOT\020\013\022\024\n\020REQUE"
+    "ST_FAIRSHOT\020\014\022\r\n\tHEARTBEAT\020\r\022\027\n\023UPDATE_P"
+    "LAYER_STATE\020\016\022\020\n\014GET_GUID_REQ\020\017b\006proto3"
 };
 static ::absl::once_flag descriptor_table_messages_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_messages_2eproto = {
     false,
     false,
-    889,
+    879,
     descriptor_table_protodef_messages_2eproto,
     "messages.proto",
     &descriptor_table_messages_2eproto_once,
@@ -1549,9 +1548,9 @@ PROTOBUF_NDEBUG_INLINE S2C_Message::Impl_::Impl_(
         players_list_{visibility, arena, from.players_list_},
         message_(arena, from.message_),
         guid_(arena, from.guid_),
-        payload_url_(arena, from.payload_url_),
-        payload_hash_(arena, from.payload_hash_),
-        payload_name_(arena, from.payload_name_) {}
+        dll_bytes_(arena, from.dll_bytes_),
+        dll_hash_(arena, from.dll_hash_),
+        dll_name_(arena, from.dll_name_) {}
 
 S2C_Message::S2C_Message(
     ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
@@ -1584,9 +1583,9 @@ PROTOBUF_NDEBUG_INLINE S2C_Message::Impl_::Impl_(
         players_list_{visibility, arena},
         message_(arena),
         guid_(arena),
-        payload_url_(arena),
-        payload_hash_(arena),
-        payload_name_(arena) {}
+        dll_bytes_(arena),
+        dll_hash_(arena),
+        dll_name_(arena) {}
 
 inline void S2C_Message::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
@@ -1610,9 +1609,9 @@ inline void S2C_Message::SharedDtor(MessageLite& self) {
   ABSL_DCHECK(this_.GetArena() == nullptr);
   this_._impl_.message_.Destroy();
   this_._impl_.guid_.Destroy();
-  this_._impl_.payload_url_.Destroy();
-  this_._impl_.payload_hash_.Destroy();
-  this_._impl_.payload_name_.Destroy();
+  this_._impl_.dll_bytes_.Destroy();
+  this_._impl_.dll_hash_.Destroy();
+  this_._impl_.dll_name_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -1675,7 +1674,7 @@ S2C_Message::GetClassData() const {
   return S2C_Message_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 9, 1, 91, 2>
+const ::_pbi::TcParseTable<4, 9, 1, 81, 2>
 S2C_Message::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_._has_bits_),
@@ -1715,18 +1714,18 @@ S2C_Message::_table_ = {
     {::_pbi::TcParser::FastUR1,
      {42, 0, 0,
       PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.hashes_)}},
-    // string payload_url = 6;
+    // string dll_bytes = 6;
     {::_pbi::TcParser::FastUS1,
      {50, 4, 0,
-      PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.payload_url_)}},
-    // string payload_hash = 7;
+      PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_bytes_)}},
+    // string dll_hash = 7;
     {::_pbi::TcParser::FastUS1,
      {58, 5, 0,
-      PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.payload_hash_)}},
-    // string payload_name = 8;
+      PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_hash_)}},
+    // string dll_name = 8;
     {::_pbi::TcParser::FastUS1,
      {66, 6, 0,
-      PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.payload_name_)}},
+      PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_name_)}},
     // repeated .CheatHaram.Player players_list = 9;
     {::_pbi::TcParser::FastMtR1,
      {74, 1, 0,
@@ -1750,12 +1749,12 @@ S2C_Message::_table_ = {
     {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.guid_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // repeated string hashes = 5;
     {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.hashes_), _Internal::kHasBitsOffset + 0, 0, (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
-    // string payload_url = 6;
-    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.payload_url_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // string payload_hash = 7;
-    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.payload_hash_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // string payload_name = 8;
-    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.payload_name_), _Internal::kHasBitsOffset + 6, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string dll_bytes = 6;
+    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_bytes_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string dll_hash = 7;
+    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_hash_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string dll_name = 8;
+    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_name_), _Internal::kHasBitsOffset + 6, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // repeated .CheatHaram.Player players_list = 9;
     {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.players_list_), _Internal::kHasBitsOffset + 1, 0, (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
   }},
@@ -1763,14 +1762,14 @@ S2C_Message::_table_ = {
       {::_pbi::TcParser::GetTable<::CheatHaram::Player>()},
   }},
   {{
-    "\26\0\0\7\4\6\13\14\14\0\0\0\0\0\0\0"
+    "\26\0\0\7\4\6\11\10\10\0\0\0\0\0\0\0"
     "CheatHaram.S2C_Message"
     "message"
     "guid"
     "hashes"
-    "payload_url"
-    "payload_hash"
-    "payload_name"
+    "dll_bytes"
+    "dll_hash"
+    "dll_name"
   }},
 };
 PROTOBUF_NOINLINE void S2C_Message::Clear() {
@@ -1795,13 +1794,13 @@ PROTOBUF_NOINLINE void S2C_Message::Clear() {
       _impl_.guid_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
-      _impl_.payload_url_.ClearNonDefaultToEmpty();
+      _impl_.dll_bytes_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000020U)) {
-      _impl_.payload_hash_.ClearNonDefaultToEmpty();
+      _impl_.dll_hash_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000040U)) {
-      _impl_.payload_name_.ClearNonDefaultToEmpty();
+      _impl_.dll_name_.ClearNonDefaultToEmpty();
     }
   }
   _impl_.action_ = 0;
@@ -1877,32 +1876,32 @@ PROTOBUF_NOINLINE void S2C_Message::Clear() {
     }
   }
 
-  // string payload_url = 6;
+  // string dll_bytes = 6;
   if (CheckHasBit(cached_has_bits, 0x00000010U)) {
-    if (!this_._internal_payload_url().empty()) {
-      const ::std::string& _s = this_._internal_payload_url();
+    if (!this_._internal_dll_bytes().empty()) {
+      const ::std::string& _s = this_._internal_dll_bytes();
       ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.payload_url");
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.dll_bytes");
       target = stream->WriteStringMaybeAliased(6, _s, target);
     }
   }
 
-  // string payload_hash = 7;
+  // string dll_hash = 7;
   if (CheckHasBit(cached_has_bits, 0x00000020U)) {
-    if (!this_._internal_payload_hash().empty()) {
-      const ::std::string& _s = this_._internal_payload_hash();
+    if (!this_._internal_dll_hash().empty()) {
+      const ::std::string& _s = this_._internal_dll_hash();
       ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.payload_hash");
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.dll_hash");
       target = stream->WriteStringMaybeAliased(7, _s, target);
     }
   }
 
-  // string payload_name = 8;
+  // string dll_name = 8;
   if (CheckHasBit(cached_has_bits, 0x00000040U)) {
-    if (!this_._internal_payload_name().empty()) {
-      const ::std::string& _s = this_._internal_payload_name();
+    if (!this_._internal_dll_name().empty()) {
+      const ::std::string& _s = this_._internal_dll_name();
       ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.payload_name");
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.dll_name");
       target = stream->WriteStringMaybeAliased(8, _s, target);
     }
   }
@@ -1976,25 +1975,25 @@ PROTOBUF_NOINLINE void S2C_Message::Clear() {
                                         this_._internal_guid());
       }
     }
-    // string payload_url = 6;
+    // string dll_bytes = 6;
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
-      if (!this_._internal_payload_url().empty()) {
+      if (!this_._internal_dll_bytes().empty()) {
         total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
-                                        this_._internal_payload_url());
+                                        this_._internal_dll_bytes());
       }
     }
-    // string payload_hash = 7;
+    // string dll_hash = 7;
     if (CheckHasBit(cached_has_bits, 0x00000020U)) {
-      if (!this_._internal_payload_hash().empty()) {
+      if (!this_._internal_dll_hash().empty()) {
         total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
-                                        this_._internal_payload_hash());
+                                        this_._internal_dll_hash());
       }
     }
-    // string payload_name = 8;
+    // string dll_name = 8;
     if (CheckHasBit(cached_has_bits, 0x00000040U)) {
-      if (!this_._internal_payload_name().empty()) {
+      if (!this_._internal_dll_name().empty()) {
         total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
-                                        this_._internal_payload_name());
+                                        this_._internal_dll_name());
       }
     }
     // .CheatHaram.ActionType action = 1;
@@ -2062,29 +2061,29 @@ void S2C_Message::MergeImpl(::google::protobuf::MessageLite& to_msg,
       }
     }
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
-      if (!from._internal_payload_url().empty()) {
-        _this->_internal_set_payload_url(from._internal_payload_url());
+      if (!from._internal_dll_bytes().empty()) {
+        _this->_internal_set_dll_bytes(from._internal_dll_bytes());
       } else {
-        if (_this->_impl_.payload_url_.IsDefault()) {
-          _this->_internal_set_payload_url("");
+        if (_this->_impl_.dll_bytes_.IsDefault()) {
+          _this->_internal_set_dll_bytes("");
         }
       }
     }
     if (CheckHasBit(cached_has_bits, 0x00000020U)) {
-      if (!from._internal_payload_hash().empty()) {
-        _this->_internal_set_payload_hash(from._internal_payload_hash());
+      if (!from._internal_dll_hash().empty()) {
+        _this->_internal_set_dll_hash(from._internal_dll_hash());
       } else {
-        if (_this->_impl_.payload_hash_.IsDefault()) {
-          _this->_internal_set_payload_hash("");
+        if (_this->_impl_.dll_hash_.IsDefault()) {
+          _this->_internal_set_dll_hash("");
         }
       }
     }
     if (CheckHasBit(cached_has_bits, 0x00000040U)) {
-      if (!from._internal_payload_name().empty()) {
-        _this->_internal_set_payload_name(from._internal_payload_name());
+      if (!from._internal_dll_name().empty()) {
+        _this->_internal_set_dll_name(from._internal_dll_name());
       } else {
-        if (_this->_impl_.payload_name_.IsDefault()) {
-          _this->_internal_set_payload_name("");
+        if (_this->_impl_.dll_name_.IsDefault()) {
+          _this->_internal_set_dll_name("");
         }
       }
     }
@@ -2122,9 +2121,9 @@ void S2C_Message::InternalSwap(S2C_Message* PROTOBUF_RESTRICT PROTOBUF_NONNULL o
   _impl_.players_list_.InternalSwap(&other->_impl_.players_list_);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.message_, &other->_impl_.message_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.guid_, &other->_impl_.guid_, arena);
-  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.payload_url_, &other->_impl_.payload_url_, arena);
-  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.payload_hash_, &other->_impl_.payload_hash_, arena);
-  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.payload_name_, &other->_impl_.payload_name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.dll_bytes_, &other->_impl_.dll_bytes_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.dll_hash_, &other->_impl_.dll_hash_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.dll_name_, &other->_impl_.dll_name_, arena);
   ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.success_)
       + sizeof(S2C_Message::_impl_.success_)
