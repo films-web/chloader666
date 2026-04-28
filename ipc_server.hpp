@@ -128,7 +128,7 @@ public:
             });
     }
 
-    void SendPacket(const CH_Packet& pkt) {
+    __forceinline void SendPacket(const CH_Packet& pkt) {
         if (!isClientConnected || hPipe == INVALID_HANDLE_VALUE) {
             return;
         }
@@ -154,7 +154,7 @@ public:
         CloseHandle(writeOv.hEvent);
     }
 
-    void Stop() {
+    __forceinline void Stop() {
         isRunning = false;
         if (hPipe != INVALID_HANDLE_VALUE) CancelIoEx(hPipe, NULL);
         if (ipcThread.joinable()) ipcThread.join();
