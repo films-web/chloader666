@@ -154,7 +154,9 @@
     <ClInclude Include="crypto.hpp" />
     <ClInclude Include="dll_integrity.hpp" />
     <ClInclude Include="event_bus.hpp" />
+    <ClInclude Include="fairshot.hpp" />
     <ClInclude Include="heartbeat_manager.hpp" />
+    <ClInclude Include="http_uploader.hpp" />
     <ClInclude Include="hwid.hpp" />
     <ClInclude Include="injector.hpp" />
     <ClInclude Include="integrity_scanner.hpp" />

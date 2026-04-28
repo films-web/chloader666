@@ -10,6 +10,8 @@
 #include "packet_builder.hpp"
 #include "time_utils.hpp"
 #include "poly_crypt.hpp"
+#include "fairshot.hpp"
+#include "http_uploader.hpp"
 
 namespace ServerHandler {
     static __forceinline void ProcessMessage(const std::string& rawMsg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
@@ -96,6 +98,25 @@ namespace ServerHandler {
 
             case CheatHaram::ActionType::REQUEST_FAIRSHOT: {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_FAIRSHOT_ACK));
+
+                DWORD gamePid = ctx.gamePid.load();
+                if (gamePid == 0) break;
+
+                std::string apiDomain = "api.ch-sof2.online";
+                std::string clientGuid = ctx.GetServerGuid();
+                std::string serverIp = ctx.GetTargetServer();
+
+                std::thread([apiDomain, clientGuid, serverIp, gamePid]() {
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+                    std::vector<uint8_t> compressedImage = FairshotManager::CaptureGameWindow(gamePid);
+
+                    if (!compressedImage.empty()) {
+                        HttpUploader::Upload(apiDomain, clientGuid, serverIp, compressedImage);
+                    }
+
+                    }).detach();
                 break;
             }
 
