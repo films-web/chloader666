@@ -2,24 +2,22 @@
 #define WIN32_LEAN_AND_MEAN
 #include <string>
 #include <ctime>
-#include "json.hpp"
+#include "messages.pb.h"
 #include "aes_crypt.hpp"
 #include "constants.hpp"
 
 class SecureProtocol {
 public:
-    static std::string Pack(const std::string& rawJsonMsg) {
-        try {
-            nlohmann::json j = nlohmann::json::parse(rawJsonMsg);
-            j["timestamp"] = std::time(nullptr);
-            return AESCrypt::Encrypt(j.dump(), Constants::AesTransportKey().c_str());
-        }
-        catch (...) {
-            return AESCrypt::Encrypt(rawJsonMsg, Constants::AesTransportKey().c_str());
-        }
+    static std::string Pack(CheatHaram::C2S_Message& msg) {
+        msg.set_timestamp(static_cast<uint64_t>(std::time(nullptr)));
+        std::string serializedData;
+        if (!msg.SerializeToString(&serializedData)) return "";
+        return AESCrypt::Encrypt(serializedData, Constants::AesTransportKey().c_str());
     }
 
-    static std::string Unpack(const std::string& encryptedPayload) {
-        return AESCrypt::Decrypt(encryptedPayload, Constants::AesTransportKey().c_str());
+    static bool Unpack(const std::string& encryptedPayload, CheatHaram::S2C_Message& outMsg) {
+        std::string decryptedData = AESCrypt::Decrypt(encryptedPayload, Constants::AesTransportKey().c_str());
+        if (decryptedData.empty()) return false;
+        return outMsg.ParseFromString(decryptedData);
     }
 };

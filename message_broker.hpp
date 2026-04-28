@@ -17,11 +17,7 @@ public:
     ~MessageBroker() { Stop(); }
 
     void SetNetworkStatus(bool status) { isNetworkConnected = status; }
-
-    void SetIpcStatus(bool status) {
-        isIpcConnected = status;
-        ipcCv.notify_all();
-    }
+    void SetIpcStatus(bool status) { isIpcConnected = status; ipcCv.notify_all(); }
 
     void Start(NetworkClient& netClient, IPCServer& ipcServer) {
         isRunning = true;
@@ -32,16 +28,11 @@ public:
                 {
                     std::unique_lock<std::mutex> lock(wsMutex);
                     wsCv.wait(lock, [this] { return !wsQueue.empty() || !isRunning; });
-
                     if (!isRunning) break;
-
                     msg = wsQueue.front();
                     wsQueue.pop();
                 }
-
-                if (!msg.empty() && isNetworkConnected) {
-                    netClient.Send(msg);
-                }
+                if (!msg.empty() && isNetworkConnected) netClient.Send(msg);
             }
             });
 
@@ -50,23 +41,18 @@ public:
                 CH_Packet pkt;
                 {
                     std::unique_lock<std::mutex> lock(ipcMutex);
-
                     ipcCv.wait(lock, [this] { return (!ipcQueue.empty() && isIpcConnected) || !isRunning; });
-
                     if (!isRunning) break;
-
                     pkt = ipcQueue.front();
                     ipcQueue.pop();
                 }
-
                 ipcServer.SendPacket(pkt);
             }
             });
     }
 
-    void PushToWS(const std::string& msg) {
+    void PushToWS(CheatHaram::C2S_Message msg) {
         std::string securePayload = SecureProtocol::Pack(msg);
-
         if (!securePayload.empty()) {
             std::lock_guard<std::mutex> lock(wsMutex);
             wsQueue.push(securePayload);
@@ -75,10 +61,8 @@ public:
     }
 
     void PushToIPC(const CH_Packet& pkt) {
-        {
-            std::lock_guard<std::mutex> lock(ipcMutex);
-            ipcQueue.push(pkt);
-        }
+        std::lock_guard<std::mutex> lock(ipcMutex);
+        ipcQueue.push(pkt);
         ipcCv.notify_one();
     }
 
@@ -87,7 +71,6 @@ public:
             isRunning = false;
             wsCv.notify_all();
             ipcCv.notify_all();
-
             if (wsThread.joinable()) wsThread.join();
             if (ipcThread.joinable()) ipcThread.join();
         }

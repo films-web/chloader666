@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="messages.pb.cc" />
     <ClCompile Include="miniz.c" />
   </ItemGroup>
   <ItemGroup>
@@ -160,7 +161,7 @@
     <ClInclude Include="integrity_scanner.hpp" />
     <ClInclude Include="ipc_handler.hpp" />
     <ClInclude Include="ipc_server.hpp" />
-    <ClInclude Include="json.hpp" />
+    <ClInclude Include="messages.pb.h" />
     <ClInclude Include="message_broker.hpp" />
     <ClInclude Include="miniz.h" />
     <ClInclude Include="network_callbacks.hpp" />
