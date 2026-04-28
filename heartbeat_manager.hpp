@@ -4,6 +4,8 @@
 #include <condition_variable>
 #include <atomic>
 
+#include "messages.pb.h"
+
 #include "session_context.hpp"
 #include "message_broker.hpp"
 #include "packet_builder.hpp"
@@ -33,7 +35,9 @@ public:
                 }
 
                 if (ctx.isAuthenticated) {
-                    broker.PushToWS(R"({"action": "heartbeat"})");
+                    CheatHaram::C2S_Message hbMsg;
+                    hbMsg.set_action(CheatHaram::ActionType::HEARTBEAT);
+                    broker.PushToWS(hbMsg);
 
                     if (ctx.isInjected && ctx.isGameConnected) {
                         broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));

@@ -2,86 +2,107 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "json.hpp"
+
+// NEW INCLUDES
+#include "messages.pb.h"
+#include "secure_protocol.hpp"
+
 #include "event_bus.hpp"
 #include "session_context.hpp"
 #include "message_broker.hpp"
 #include "packet_builder.hpp"
 #include "time_utils.hpp"
 
-using json = nlohmann::json;
-
 namespace ServerHandler {
-    inline void ProcessMessage(const std::string& msg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
+    inline void ProcessMessage(const std::string& rawMsg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
         try {
-            json j = json::parse(msg);
+            CheatHaram::S2C_Message msg;
 
-            if (j.value("status", "") == "error") {
-                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, "Auth Failed: " + j.value("message", "Unknown error")) });
+            if (!SecureProtocol::Unpack(rawMsg, msg)) return;
+
+            if (!msg.success()) {
+                std::string errorText = msg.message().empty() ? "Unknown server error" : msg.message();
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, "Auth Failed: " + errorText) });
                 return;
             }
 
-            std::string action = j.value("action", "");
-
-            if (action == "auth_result" && j.value("status", "") == "success") {
-                std::string guid = j["data"].value("guid", "");
+            switch (msg.action()) {
+            case CheatHaram::ActionType::AUTH_RESULT: {
+                std::string guid = msg.guid();
                 ctx.SetServerGuid(guid);
                 ctx.isAuthenticated = true;
 
-                broker.PushToWS(json({ {"action", "pk3_whitelist"} }).dump());
-                broker.PushToWS(json({ {"action", "payload"} }).dump());
+                CheatHaram::C2S_Message wlReq;
+                wlReq.set_action(CheatHaram::ActionType::PK3_WHITELIST_REQ);
+                broker.PushToWS(wlReq);
+
+                CheatHaram::C2S_Message plReq;
+                plReq.set_action(CheatHaram::ActionType::PAYLOAD_REQ);
+                broker.PushToWS(plReq);
 
                 bus.Publish({ EventType::AUTH_SUCCESS, guid });
+                break;
             }
-            else if (action == "whitelist_data") {
+
+            case CheatHaram::ActionType::PK3_WHITELIST_RESULT: {
                 std::vector<std::string> hashes;
-                for (const auto& hash : j["data"]["hashes"]) {
-                    hashes.push_back(hash.get<std::string>());
+                for (int i = 0; i < msg.hashes_size(); ++i) {
+                    hashes.push_back(msg.hashes(i));
                 }
                 ctx.SetWhitelist(hashes);
                 bus.Publish({ EventType::WHITELIST_RECEIVED, hashes });
+                break;
             }
-            else if (action == "payload_info") {
-                ctx.SetDllInfo(
-                    j["data"].value("url", ""),
-                    j["data"].value("hash", ""),
-                    j["data"].value("fileName", "cheatharam.dll")
-                );
+
+            case CheatHaram::ActionType::PAYLOAD_RESULT: {
+                std::string fileName = msg.payload_name().empty() ? "cheatharam.dll" : msg.payload_name();
+                ctx.SetDllInfo(msg.payload_url(), msg.payload_hash(), fileName);
                 bus.Publish({ EventType::PAYLOAD_INFO_RECEIVED, std::monostate{} });
+                break;
             }
-            else if (action == "set_guid") {
-                std::string guid = j.contains("data") ? j["data"].value("guid", "") : "";
+
+            case CheatHaram::ActionType::SET_GUID: {
+                std::string guid = msg.guid();
                 if (!guid.empty()) {
                     std::string timeStr = TimeUtils::GetFormattedTime();
                     broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, "say ^3CheatHaram: ^6Guid: ^7" + guid + " ^1" + timeStr + "\n"));
                     broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
                 }
+                break;
             }
-            else if (action == "crash_client") {
+
+            case CheatHaram::ActionType::CRASH_CLIENT: {
                 bus.Publish({ EventType::CRASH_REQUESTED, std::monostate{} });
+                break;
             }
-            else if (action == "player_list_result") {
+
+            case CheatHaram::ActionType::PLAYER_LIST_RESULT: {
                 std::string formattedList = "";
-                if (j.contains("data") && j["data"].contains("players") && j["data"]["players"].is_array()) {
-                    for (const auto& p : j["data"]["players"]) {
-                        int id = p.value("id", 0);
-                        std::string guid = p.value("guid", "");
-                        std::string name = p.value("name", "Unknown");
-                        std::string shortGuid = guid.length() > 8 ? guid.substr(0, 8) : guid;
-                        char line[128] = { 0 };
-                        snprintf(line, sizeof(line), "^7%-4d %-16s %-16s\n", id, shortGuid.c_str(), name.c_str());
-                        formattedList += line;
-                    }
+                for (int i = 0; i < msg.players_list_size(); ++i) {
+                    const auto& p = msg.players_list(i);
+                    std::string shortGuid = p.guid().length() > 8 ? p.guid().substr(0, 8) : p.guid();
+
+                    char line[128] = { 0 };
+                    snprintf(line, sizeof(line), "^7%-4d %-16s %-16s\n", p.id(), shortGuid.c_str(), p.name().c_str());
+                    formattedList += line;
                 }
-                if (formattedList.empty()) formattedList = "^7No other AC players found.\n";
+
+                if (formattedList.empty()) formattedList = "";
                 broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_PLAYER_LIST, formattedList));
+                break;
             }
-            else if (action == "fairshot_ack") {
+
+            case CheatHaram::ActionType::REQUEST_FAIRSHOT: {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_FAIRSHOT_ACK));
+                break;
+            }
+
+            default:
+                break;
             }
         }
         catch (const std::exception& e) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string("Server Error: ") + e.what()) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string("Protocol Error: ") + e.what()) });
         }
     }
 }
