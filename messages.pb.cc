@@ -261,22 +261,22 @@ const char descriptor_table_protodef_messages_2eproto[] ABSL_ATTRIBUTE_SECTION_V
     "(\010\022\017\n\007message\030\003 \001(\t\022\014\n\004guid\030\004 \001(\t\022\016\n\006has"
     "hes\030\005 \003(\t\022\023\n\013payload_url\030\006 \001(\t\022\024\n\014payloa"
     "d_hash\030\007 \001(\t\022\024\n\014payload_name\030\010 \001(\t\022(\n\014pl"
-    "ayers_list\030\t \003(\0132\022.CheatHaram.Player*\276\002\n"
+    "ayers_list\030\t \003(\0132\022.CheatHaram.Player*\302\002\n"
     "\nActionType\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQUEST"
     "\020\001\022\017\n\013AUTH_RESULT\020\002\022\025\n\021PK3_WHITELIST_REQ"
     "\020\003\022\030\n\024PK3_WHITELIST_RESULT\020\004\022\017\n\013PAYLOAD_"
     "REQ\020\005\022\022\n\016PAYLOAD_RESULT\020\006\022\014\n\010SET_GUID\020\007\022"
     "\020\n\014CRASH_CLIENT\020\010\022\023\n\017PLAYER_LIST_REQ\020\t\022\026"
     "\n\022PLAYER_LIST_RESULT\020\n\022\021\n\rTAKE_FAIRSHOT\020"
-    "\013\022\020\n\014FAIRSHOT_ACK\020\014\022\r\n\tHEARTBEAT\020\r\022\027\n\023UP"
-    "DATE_PLAYER_STATE\020\016\022\020\n\014GET_GUID_REQ\020\017b\006p"
-    "roto3"
+    "\013\022\024\n\020REQUEST_FAIRSHOT\020\014\022\r\n\tHEARTBEAT\020\r\022\027"
+    "\n\023UPDATE_PLAYER_STATE\020\016\022\020\n\014GET_GUID_REQ\020"
+    "\017b\006proto3"
 };
 static ::absl::once_flag descriptor_table_messages_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_messages_2eproto = {
     false,
     false,
-    885,
+    889,
     descriptor_table_protodef_messages_2eproto,
     "messages.proto",
     &descriptor_table_messages_2eproto_once,

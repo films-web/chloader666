@@ -3,7 +3,7 @@
 #include "message_broker.hpp"
 #include "event_bus.hpp"
 #include "session_context.hpp"
-#include "json.hpp"
+#include "messages.pb.h"
 #include <string>
 
 namespace IPCHandler {
@@ -11,28 +11,42 @@ namespace IPCHandler {
         if (pkt.size < 0 || pkt.size > MAX_PAYLOAD_SIZE) return;
 
         if (pkt.type == CH_INFO_PLAYER_DATA) {
-            if (pkt.size == sizeof(CH_PlayerDataPayload)) {
+            if (pkt.size >= sizeof(CH_PlayerDataPayload)) {
                 const CH_PlayerDataPayload* data = reinterpret_cast<const CH_PlayerDataPayload*>(pkt.payload);
-                nlohmann::json j;
-                j["action"] = "update_state";
-                j["data"]["name"] = data->name;
-                j["data"]["playerNum"] = data->playerNum;
-                j["data"]["state"] = data->inGame;
-                j["data"]["server"] = data->server;
-                broker.PushToWS(j.dump());
+
+                CheatHaram::C2S_Message msg;
+                msg.set_action(CheatHaram::ActionType::UPDATE_PLAYER_STATE);
+                auto* pData = msg.mutable_player_data();
+                pData->set_id(data->playerNum);
+                pData->set_name(data->name);
+                pData->set_server_ip(data->server);
+                pData->set_in_game(data->inGame > 0);
+
+                broker.PushToWS(msg);
             }
         }
 
         else if (pkt.type == CH_CMD_REQUEST_PLAYER_LIST) {
-            broker.PushToWS(nlohmann::json({ {"action", "get_player_list"} }).dump());
+            CheatHaram::C2S_Message msg;
+            msg.set_action(CheatHaram::ActionType::PLAYER_LIST_REQ);
+            broker.PushToWS(msg);
         }
+
         else if (pkt.type == CH_CMD_REQUEST_FAIRSHOT && pkt.size > 0) {
+            CheatHaram::C2S_Message msg;
+            msg.set_action(CheatHaram::ActionType::REQUEST_FAIRSHOT);
             std::string targetInfo(reinterpret_cast<const char*>(pkt.payload), pkt.size);
-            broker.PushToWS(nlohmann::json({ {"action", "request_fairshot"}, {"target", targetInfo} }).dump());
+            msg.set_target(targetInfo);
+
+            broker.PushToWS(msg);
         }
+
         else if (pkt.type == CH_CMD_REQUEST_GUID) {
-            broker.PushToWS(nlohmann::json({ {"action", "request_guid"} }).dump());
+            CheatHaram::C2S_Message msg;
+            msg.set_action(CheatHaram::ActionType::GET_GUID_REQ);
+            broker.PushToWS(msg);
         }
+
         else if (pkt.type == CH_CMD_REQUEST_SCAN) {
             bus.Publish({ EventType::START_SCAN, std::monostate{} });
         }
