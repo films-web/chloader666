@@ -5,6 +5,7 @@
 #include "messages.pb.h"
 #include "aes_crypt.hpp"
 #include "constants.hpp"
+#include "time_utils.hpp"
 
 class SecureProtocol {
 public:
