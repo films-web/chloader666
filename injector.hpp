@@ -6,9 +6,11 @@
 #include <filesystem>
 #include <functional>
 
+#include "poly_crypt.hpp"
+
 class Injector {
 public:
-    static bool IsProcessRunning(DWORD pid) {
+    static __forceinline bool IsProcessRunning(DWORD pid) {
         if (pid == 0) return false;
         HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, pid);
         if (process == NULL) return false;
@@ -17,7 +19,7 @@ public:
         return ret == WAIT_TIMEOUT;
     }
 
-    static DWORD LaunchAndInject(
+    static __forceinline DWORD LaunchAndInject(
         const std::string& exePath,
         const std::string& dllPath,
         std::function<void(HANDLE hProc, DWORD pid, DWORD_PTR baseAddr)> onPreResume = nullptr
@@ -35,12 +37,12 @@ public:
             VirtualFreeEx(pi.hProcess, allocMem, 0, MEM_RELEASE); TerminateProcess(pi.hProcess, 1); CloseHandle(pi.hThread); CloseHandle(pi.hProcess); return 0;
         }
 
-        HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+        HMODULE hKernel32 = GetModuleHandleA(PCrypt("kernel32.dll").c_str());
         if (!hKernel32) {
             VirtualFreeEx(pi.hProcess, allocMem, 0, MEM_RELEASE); TerminateProcess(pi.hProcess, 1); CloseHandle(pi.hThread); CloseHandle(pi.hProcess); return 0;
         }
 
-        FARPROC loadLibAddr = GetProcAddress(hKernel32, "LoadLibraryA");
+        FARPROC loadLibAddr = GetProcAddress(hKernel32, PCrypt("LoadLibraryA").c_str());
         if (!loadLibAddr) {
             VirtualFreeEx(pi.hProcess, allocMem, 0, MEM_RELEASE); TerminateProcess(pi.hProcess, 1); CloseHandle(pi.hThread); CloseHandle(pi.hProcess); return 0;
         }
@@ -74,7 +76,7 @@ public:
         return pid;
     }
 
-    static DWORD GetProcessIdByName(const std::string& processName) {
+    static __forceinline DWORD GetProcessIdByName(const std::string& processName) {
         DWORD processId = 0;
         HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
