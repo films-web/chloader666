@@ -16,8 +16,8 @@ public:
     MessageBroker() : isRunning(false), isNetworkConnected(false), isIpcConnected(false) {}
     ~MessageBroker() { Stop(); }
 
-    void SetNetworkStatus(bool status) { isNetworkConnected = status; }
-    void SetIpcStatus(bool status) { isIpcConnected = status; ipcCv.notify_all(); }
+    __forceinline void SetNetworkStatus(bool status) { isNetworkConnected = status; }
+    __forceinline void SetIpcStatus(bool status) { isIpcConnected = status; ipcCv.notify_all(); }
 
     void Start(NetworkClient& netClient, IPCServer& ipcServer) {
         isRunning = true;
@@ -51,7 +51,7 @@ public:
             });
     }
 
-    void PushToWS(CheatHaram::C2S_Message msg) {
+    __forceinline void PushToWS(CheatHaram::C2S_Message& msg) {
         std::string securePayload = SecureProtocol::Pack(msg);
         if (!securePayload.empty()) {
             std::lock_guard<std::mutex> lock(wsMutex);
@@ -60,7 +60,7 @@ public:
         }
     }
 
-    void PushToIPC(const CH_Packet& pkt) {
+    __forceinline void PushToIPC(const CH_Packet& pkt) {
         std::lock_guard<std::mutex> lock(ipcMutex);
         ipcQueue.push(pkt);
         ipcCv.notify_one();
