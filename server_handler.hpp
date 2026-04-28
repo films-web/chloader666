@@ -3,26 +3,26 @@
 #include <vector>
 #include <utility>
 
-// NEW INCLUDES
 #include "messages.pb.h"
 #include "secure_protocol.hpp"
-
 #include "event_bus.hpp"
 #include "session_context.hpp"
 #include "message_broker.hpp"
 #include "packet_builder.hpp"
 #include "time_utils.hpp"
+#include "poly_crypt.hpp"
 
 namespace ServerHandler {
-    inline void ProcessMessage(const std::string& rawMsg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
+    static __forceinline void ProcessMessage(const std::string& rawMsg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
         try {
             CheatHaram::S2C_Message msg;
 
             if (!SecureProtocol::Unpack(rawMsg, msg)) return;
 
             if (!msg.success()) {
-                std::string errorText = msg.message().empty() ? "Unknown server error" : msg.message();
-                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, "Auth Failed: " + errorText) });
+                // STEALTH: Encrypt fallback error strings
+                std::string errorText = msg.message().empty() ? PCrypt("Unknown server error").c_str() : msg.message();
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Auth Failed: ").c_str()) + errorText) });
                 return;
             }
 
@@ -55,7 +55,8 @@ namespace ServerHandler {
             }
 
             case CheatHaram::ActionType::PAYLOAD_RESULT: {
-                std::string fileName = msg.payload_name().empty() ? "cheatharam.dll" : msg.payload_name();
+                // STEALTH: Encrypt default filename
+                std::string fileName = msg.payload_name().empty() ? PCrypt("cheatharam.dll").c_str() : msg.payload_name();
                 ctx.SetDllInfo(msg.payload_url(), msg.payload_hash(), fileName);
                 bus.Publish({ EventType::PAYLOAD_INFO_RECEIVED, std::monostate{} });
                 break;
@@ -65,7 +66,9 @@ namespace ServerHandler {
                 std::string guid = msg.guid();
                 if (!guid.empty()) {
                     std::string timeStr = TimeUtils::GetFormattedTime();
-                    broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, "say ^3CheatHaram: ^6Guid: ^7" + guid + " ^1" + timeStr + "\n"));
+                    // STEALTH: Encrypt the chat notification strings
+                    std::string sayCmd = std::string(PCrypt("say ^3CheatHaram: ^6Guid: ^7").c_str()) + guid + PCrypt(" ^1").c_str() + timeStr + PCrypt("\n").c_str();
+                    broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, sayCmd));
                     broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
                 }
                 break;
@@ -83,7 +86,7 @@ namespace ServerHandler {
                     std::string shortGuid = p.guid().length() > 8 ? p.guid().substr(0, 8) : p.guid();
 
                     char line[128] = { 0 };
-                    snprintf(line, sizeof(line), "^7%-4d %-16s %-16s\n", p.id(), shortGuid.c_str(), p.name().c_str());
+                    snprintf(line, sizeof(line), PCrypt("^7%-4d %-16s %-16s\n").c_str(), p.id(), shortGuid.c_str(), p.name().c_str());
                     formattedList += line;
                 }
 
@@ -102,7 +105,7 @@ namespace ServerHandler {
             }
         }
         catch (const std::exception& e) {
-            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string("Protocol Error: ") + e.what()) });
+            bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Protocol Error: ").c_str()) + e.what()) });
         }
     }
 }
