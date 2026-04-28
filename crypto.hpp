@@ -8,19 +8,20 @@
 
 #pragma comment(lib, "bcrypt.lib")
 
+#include "poly_crypt.hpp"
+
 #ifndef NT_SUCCESS
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 #endif
 
 namespace Crypto {
-
-    inline uint32_t HashFNV(const BYTE* d, size_t s) {
+    __forceinline uint32_t HashFNV(const BYTE* d, size_t s) {
         uint32_t h = 0x811c9dc5u;
         for (size_t i = 0; i < s; ++i) { h ^= d[i]; h *= 0x01000193u; }
         return h;
     }
 
-    inline uint32_t HashSum(const BYTE* d, size_t s) {
+    __forceinline uint32_t HashSum(const BYTE* d, size_t s) {
         uint32_t h = 0u;
         for (size_t i = 0; i < s; ++i) {
             h += d[i];
@@ -29,28 +30,29 @@ namespace Crypto {
         return h;
     }
 
-    inline std::string Base64Encode(const std::vector<unsigned char>& data) {
-        static const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    __forceinline std::string Base64Encode(const std::vector<unsigned char>& data) {
+        auto lookup = PCrypt("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
         std::string out;
         int val = 0, valb = -6;
         for (unsigned char c : data) {
             val = (val << 8) + c;
             valb += 8;
             while (valb >= 0) {
-                out.push_back(lookup[(val >> valb) & 0x3F]);
+                out.push_back(lookup.c_str()[(val >> valb) & 0x3F]);
                 valb -= 6;
             }
         }
-        if (valb > -6) out.push_back(lookup[((val << 8) >> (valb + 8)) & 0x3F]);
+        if (valb > -6) out.push_back(lookup.c_str()[((val << 8) >> (valb + 8)) & 0x3F]);
         while (out.size() % 4) out.push_back('=');
         return out;
     }
 
-    inline std::vector<unsigned char> Base64Decode(const std::string& in) {
-        static const std::string b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    __forceinline std::vector<unsigned char> Base64Decode(const std::string& in) {
+        // ENCRYPTED: Hide the Base64 lookup table.
+        auto b64 = PCrypt("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
         std::vector<unsigned char> out;
         std::vector<int> T(256, -1);
-        for (int i = 0; i < 64; i++) T[b64[i]] = i;
+        for (int i = 0; i < 64; i++) T[b64.c_str()[i]] = i;
         int val = 0, valb = -8;
         for (unsigned char c : in) {
             if (T[c] == -1) break;
@@ -64,7 +66,7 @@ namespace Crypto {
         return out;
     }
 
-    inline std::string GenerateSHA256Key(const std::string& message, const std::string& key) {
+    __forceinline std::string GenerateSHA256Key(const std::string& message, const std::string& key) {
         BCRYPT_ALG_HANDLE hAlg = NULL;
         BCRYPT_HASH_HANDLE hHash = NULL;
         DWORD cbHashObject = 0, cbData = 0;
@@ -84,7 +86,7 @@ namespace Crypto {
 
         for (DWORD i = 0; i < cbData; i++) {
             char buf[3];
-            snprintf(buf, sizeof(buf), "%02x", pbHash[i]);
+            snprintf(buf, sizeof(buf), PCrypt("%02x").c_str(), pbHash[i]);
             hexResult += buf;
         }
 
@@ -97,7 +99,7 @@ namespace Crypto {
         return hexResult;
     }
 
-    inline std::string CalculateSHA256String(const std::string& input) {
+    __forceinline std::string CalculateSHA256String(const std::string& input) {
         BCRYPT_ALG_HANDLE hAlg = NULL;
         BCRYPT_HASH_HANDLE hHash = NULL;
         DWORD cbHashObject = 0, cbData = 0;
@@ -117,7 +119,7 @@ namespace Crypto {
 
         for (DWORD i = 0; i < cbData; i++) {
             char buf[3];
-            snprintf(buf, sizeof(buf), "%02x", pbHash[i]);
+            snprintf(buf, sizeof(buf), PCrypt("%02x").c_str(), pbHash[i]);
             hexResult += buf;
         }
 
@@ -130,7 +132,7 @@ namespace Crypto {
         return hexResult;
     }
 
-    inline std::string CalculateSHA256File(const std::string& filepath) {
+    __forceinline std::string CalculateSHA256File(const std::string& filepath) {
         BCRYPT_ALG_HANDLE hAlg = NULL;
         BCRYPT_HASH_HANDLE hHash = NULL;
         DWORD cbHashObject = 0, cbData = 0;
@@ -164,7 +166,7 @@ namespace Crypto {
 
         for (DWORD i = 0; i < cbData; i++) {
             char buf[3];
-            snprintf(buf, sizeof(buf), "%02x", pbHash[i]);
+            snprintf(buf, sizeof(buf), PCrypt("%02x").c_str(), pbHash[i]);
             hexResult += buf;
         }
 
