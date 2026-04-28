@@ -6,6 +6,8 @@
 #include <atomic>
 #include <chrono>
 
+#include "poly_crypt.hpp"
+
 class AntiDebug {
 private:
     struct PEB_FULL {
@@ -31,24 +33,29 @@ private:
         ULONG NtGlobalFlag;
     };
 
-    static PEB_FULL* GetPEB() {
+    static __forceinline PEB_FULL* GetPEB() {
         return (PEB_FULL*)__readfsdword(0x30);
     }
 
-    static bool CheckNtGlobalFlag() {
+    static __forceinline bool CheckNtGlobalFlag() {
         PEB_FULL* peb = GetPEB();
         if (!peb) return false;
         return (peb->NtGlobalFlag & 0x70) != 0;
     }
 
-    static bool CheckDebuggerPresent() {
-        if (IsDebuggerPresent()) return true;
+    static __forceinline bool CheckDebuggerPresent() {
+        PEB_FULL* peb = GetPEB();
+        if (peb && peb->BeingDebugged == 1) return true;
         BOOL isRemote = FALSE;
-        CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemote);
+        HMODULE hKernel32 = GetModuleHandleA(PCrypt("kernel32.dll").c_str());
+        if (hKernel32) {
+            auto pCheckRemote = (BOOL(WINAPI*)(HANDLE, PBOOL))GetProcAddress(hKernel32, PCrypt("CheckRemoteDebuggerPresent").c_str());
+            if (pCheckRemote) pCheckRemote(GetCurrentProcess(), &isRemote);
+        }
         return isRemote == TRUE;
     }
 
-    static bool CheckHardwareBreakpoints() {
+    static __forceinline bool CheckHardwareBreakpoints() {
         bool found = false;
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
         if (hThreadSnap == INVALID_HANDLE_VALUE) return false;
@@ -78,13 +85,13 @@ private:
         return found;
     }
 
-    static bool IsBeingDebugged() {
+    static __forceinline bool IsBeingDebugged() {
         return CheckDebuggerPresent()
             || CheckHardwareBreakpoints()
             || CheckNtGlobalFlag();
     }
 
-    [[noreturn]] static void Terminate() {
+    [[noreturn]] static __forceinline void Terminate() {
         TerminateProcess(GetCurrentProcess(), 0xDEAD);
         __fastfail(0xDEAD);
     }
@@ -92,7 +99,7 @@ private:
     static inline std::atomic<bool> isRunning{ false };
 
 public:
-    static void Start(std::atomic<bool>& globalRunning) {
+    static __forceinline void Start(std::atomic<bool>& globalRunning) {
         isRunning = true;
         std::thread([&globalRunning]() {
             while (isRunning && globalRunning) {
@@ -102,5 +109,5 @@ public:
             }).detach();
     }
 
-    static void Stop() { isRunning = false; }
+    static __forceinline void Stop() { isRunning = false; }
 };
