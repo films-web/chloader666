@@ -166,6 +166,7 @@
     <ClInclude Include="network_callbacks.hpp" />
     <ClInclude Include="network_client.hpp" />
     <ClInclude Include="packet_builder.hpp" />
+    <ClInclude Include="payload_handler.hpp" />
     <ClInclude Include="protocol.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="secure_protocol.hpp" />

@@ -116,6 +116,9 @@
     <ClInclude Include="messages.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="payload_handler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CheatHaram-Loader.rc">
