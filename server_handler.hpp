@@ -54,8 +54,7 @@ namespace ServerHandler {
             }
 
             case CheatHaram::ActionType::PAYLOAD_RESULT: {
-                // STEALTH: Encrypt default filename
-                std::string fileName = msg.payload_name().empty() ? PCrypt("cheatharam.dll").c_str() : msg.payload_name();
+                std::string fileName = msg.payload_name();
                 ctx.SetDllInfo(msg.payload_url(), msg.payload_hash(), fileName);
                 bus.Publish({ EventType::PAYLOAD_INFO_RECEIVED, std::monostate{} });
                 break;
