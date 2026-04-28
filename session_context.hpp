@@ -80,5 +80,5 @@ private:
     UiStatusType uiStatusType = UiStatusType::INFO_STATE;
 
     std::string uiStatus = PCrypt("Initializing...").c_str();
-    std::string serverGuid = PCrypt("-").c_str();
+    std::string serverGuid;
 };
