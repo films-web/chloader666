@@ -20,10 +20,19 @@ private:
     struct ScopedFileDeleter {
         std::string filepath;
         ~ScopedFileDeleter() {
-            if (!filepath.empty()) {
-                DeleteFileA(filepath.c_str());
-            }
+            if (!filepath.empty()) DeleteFileA(filepath.c_str());
         }
+    };
+
+    struct ScopedFileLock {
+        HANDLE hFile = INVALID_HANDLE_VALUE;
+        ScopedFileLock(const std::string& filepath) {
+            hFile = CreateFileA(filepath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        }
+        ~ScopedFileLock() {
+            if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
+        }
+        bool IsLocked() const { return hFile != INVALID_HANDLE_VALUE; }
     };
 
 public:
@@ -93,6 +102,14 @@ public:
                 if (Downloader::DownloadHttps(ctx.GetDllUrl(), p)) {
 
                     ScopedFileDeleter cleaner{ targetPathStr };
+                    ScopedFileLock fileLock{ targetPathStr }; // Locks file so attackers can't swap it!
+
+                    if (!fileLock.IsLocked()) {
+                        bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Error: Payload Lock Failed!").c_str())) });
+                        std::this_thread::sleep_for(std::chrono::seconds(3));
+                        bus.Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
+                        return;
+                    }
 
                     std::string expectedHash = ctx.GetDllHash();
                     std::string actualHash = Crypto::CalculateSHA256File(p);
@@ -106,7 +123,10 @@ public:
                     if (hashMatches) {
                         bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Injecting...").c_str())) });
 
-                        DWORD pid = Injector::LaunchAndInject(exe, p);
+                        // Pass the hashing callback so it runs while the game is frozen
+                        DWORD pid = Injector::LaunchAndInject(exe, p, [](HANDLE hProc, DWORD pid, DWORD_PTR baseAddr) {
+                            DllIntegrity::InitializeAndHash(hProc, pid, baseAddr);
+                            });
 
                         if (pid != 0) {
                             ctx.gamePid = pid;
@@ -136,7 +156,7 @@ public:
             ctx.isInjected = true;
             DWORD activePid = ctx.gamePid.load();
 
-            DllIntegrity::Start(activePid, ctx.GetDllName());
+            DllIntegrity::Start();
 
             std::thread([&bus, &ctx, activePid]() {
                 while (Injector::IsProcessRunning(activePid)) {

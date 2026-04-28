@@ -1,6 +1,7 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tlhelp32.h>
 #include <thread>
 #include <atomic>
 #include <chrono>
@@ -48,12 +49,33 @@ private:
     }
 
     static bool CheckHardwareBreakpoints() {
-        CONTEXT ctx = {};
-        ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-        HANDLE hThread = GetCurrentThread();
-        if (!GetThreadContext(hThread, &ctx)) return false;
+        bool found = false;
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap == INVALID_HANDLE_VALUE) return false;
 
-        return (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0);
+        THREADENTRY32 te32;
+        te32.dwSize = sizeof(THREADENTRY32);
+        DWORD myPid = GetCurrentProcessId();
+
+        if (Thread32First(hThreadSnap, &te32)) {
+            do {
+                if (te32.th32OwnerProcessID == myPid) {
+                    HANDLE hThread = OpenThread(THREAD_GET_CONTEXT, FALSE, te32.th32ThreadID);
+                    if (hThread) {
+                        CONTEXT ctx = {};
+                        ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+                        if (GetThreadContext(hThread, &ctx)) {
+                            if (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0) {
+                                found = true;
+                            }
+                        }
+                        CloseHandle(hThread);
+                    }
+                }
+            } while (Thread32Next(hThreadSnap, &te32) && !found);
+        }
+        CloseHandle(hThreadSnap);
+        return found;
     }
 
     static bool IsBeingDebugged() {
@@ -72,7 +94,6 @@ private:
 public:
     static void Start(std::atomic<bool>& globalRunning) {
         isRunning = true;
-
         std::thread([&globalRunning]() {
             while (isRunning && globalRunning) {
                 if (IsBeingDebugged()) Terminate();
