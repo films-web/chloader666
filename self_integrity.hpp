@@ -7,7 +7,7 @@
 #include <random>
 
 #include "crypto.hpp"
-#include "poly_crypt.hpp" // NEW: For string encryption
+#include "poly_crypt.hpp"
 
 class SelfIntegrity {
 private:
