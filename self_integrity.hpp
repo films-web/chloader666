@@ -7,6 +7,7 @@
 #include <random>
 
 #include "crypto.hpp"
+#include "poly_crypt.hpp" // NEW: For string encryption
 
 class SelfIntegrity {
 private:
@@ -22,7 +23,7 @@ private:
     static inline BYTE* textBase{ nullptr };
     static inline size_t textSize{ 0 };
 
-    static bool LocateTextSection() {
+    static __forceinline bool LocateTextSection() {
         HMODULE mod = GetModuleHandleA(NULL);
         if (!mod) return false;
         auto* dos = reinterpret_cast<PIMAGE_DOS_HEADER>(mod);
@@ -30,7 +31,7 @@ private:
             reinterpret_cast<BYTE*>(mod) + dos->e_lfanew);
         auto* sec = IMAGE_FIRST_SECTION(nt);
         for (WORD i = 0; i < nt->FileHeader.NumberOfSections; ++i, ++sec) {
-            if (strncmp(reinterpret_cast<const char*>(sec->Name), ".text", 5) == 0) {
+            if (strncmp(reinterpret_cast<const char*>(sec->Name), PCrypt(".text").c_str(), 5) == 0) {
                 textBase = reinterpret_cast<BYTE*>(mod) + sec->VirtualAddress;
                 textSize = sec->Misc.VirtualSize;
                 return true;
@@ -39,7 +40,7 @@ private:
         return false;
     }
 
-    static void DeriveMasks() {
+    static __forceinline void DeriveMasks() {
         volatile uintptr_t stackVar = 0xBEEF1234;
         maskA = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&stackVar))
             ^ 0xA5A5A5A5u;
@@ -49,12 +50,12 @@ private:
         if (maskB == 0) maskB = 0xC0DEBABEu;
     }
 
-    [[noreturn]] static void Terminate() {
+    [[noreturn]] static __forceinline void Terminate() {
         TerminateProcess(GetCurrentProcess(), 0xDEAD);
         __fastfail(0xDEAD);
     }
 
-    static bool Verify() {
+    static __forceinline bool Verify() {
         uint32_t currentFnv = Crypto::HashFNV(textBase, textSize);
         uint32_t currentSum = Crypto::HashSum(textBase, textSize);
 
@@ -72,7 +73,7 @@ private:
     }
 
 public:
-    static void Start() {
+    static __forceinline void Start() {
         if (!LocateTextSection()) return;
 
         DeriveMasks();
@@ -103,5 +104,5 @@ public:
             }).detach();
     }
 
-    static void Stop() { isRunning = false; }
+    static __forceinline void Stop() { isRunning = false; }
 };
