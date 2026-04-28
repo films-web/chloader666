@@ -44,8 +44,7 @@ struct Event {
 class EventBus {
 public:
     using SubscriberCallback = std::function<void(const Event&)>;
-
-    void Publish(const Event& event) {
+    __forceinline void Publish(const Event& event) {
         {
             std::lock_guard<std::mutex> lock(queueMutex);
             eventQueue.push(event);
@@ -53,11 +52,11 @@ public:
         queueCondition.notify_one();
     }
 
-    void Subscribe(EventType type, SubscriberCallback callback) {
+    __forceinline void Subscribe(EventType type, SubscriberCallback callback) {
         subscribers[type].push_back(callback);
     }
 
-    void RunDispatcher() {
+    __forceinline void RunDispatcher() {
         isRunning = true;
         dispatcherThread = std::thread([this]() {
             while (isRunning) {
@@ -85,7 +84,7 @@ public:
             });
     }
 
-    void Stop() {
+    __forceinline void Stop() {
         if (isRunning) {
             Publish({ EventType::SHUTDOWN_REQUESTED, std::monostate{} });
         }
@@ -95,7 +94,7 @@ public:
     }
 
 private:
-    void Dispatch(const Event& event) {
+    __forceinline void Dispatch(const Event& event) {
         auto it = subscribers.find(event.type);
         if (it != subscribers.end()) {
             for (const auto& callback : it->second) {
