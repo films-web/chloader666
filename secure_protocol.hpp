@@ -9,7 +9,7 @@
 class SecureProtocol {
 public:
     static __forceinline std::string Pack(CheatHaram::C2S_Message& msg) {
-        msg.set_timestamp(static_cast<uint64_t>(std::time(nullptr)));
+        msg.set_timestamp(TimeUtils::GetUnixTimestamp());
         std::string serializedData;
         if (!msg.SerializeToString(&serializedData)) return "";
         return AESCrypt::Encrypt(serializedData, Constants::AesTransportKey().c_str());
