@@ -37,7 +37,7 @@ enum class EventType {
 };
 
 struct Event {
-    EventType type;
+    EventType type {};
     std::variant<std::monostate, std::string, std::vector<std::string>, std::pair<UiStatusType, std::string>> payload;
 };
 
