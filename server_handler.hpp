@@ -21,7 +21,10 @@ namespace ServerHandler {
 
             if (!msg.success()) {
                 std::string errorText = msg.message().empty() ? PCrypt("Unknown server error").c_str() : msg.message();
-                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Auth Failed: ").c_str()) + errorText) });
+
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Server Error: ").c_str()) + errorText) });
+
+                broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_PRINT_CONSOLE, errorText));
                 return;
             }
 
@@ -97,7 +100,7 @@ namespace ServerHandler {
             }
 
             case CheatHaram::ActionType::REQUEST_FAIRSHOT: {
-                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_FAIRSHOT_ACK));
+                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_TOGGLECONSOLE));
 
                 DWORD gamePid = ctx.gamePid.load();
                 if (gamePid == 0) break;
@@ -117,6 +120,10 @@ namespace ServerHandler {
                     }
 
                     }).detach();
+                break;
+            }
+            case CheatHaram::ActionType::FAIRSHOT_ACK: {
+                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_RESET_WAIT_STATE));
                 break;
             }
 

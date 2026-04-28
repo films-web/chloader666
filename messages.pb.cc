@@ -267,7 +267,7 @@ const char descriptor_table_protodef_messages_2eproto[] ABSL_ATTRIBUTE_SECTION_V
     "d\030\004 \001(\t\022\016\n\006hashes\030\005 \003(\t\022\021\n\tdll_bytes\030\006 \001"
     "(\014\022\020\n\010dll_hash\030\007 \001(\t\022\020\n\010dll_name\030\010 \001(\t\022("
     "\n\014players_list\030\t \003(\0132\022.CheatHaram.Player"
-    "*\302\002\n\nActionType\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQ"
+    "*\324\002\n\nActionType\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQ"
     "UEST\020\001\022\017\n\013AUTH_RESULT\020\002\022\025\n\021PK3_WHITELIST"
     "_REQ\020\003\022\030\n\024PK3_WHITELIST_RESULT\020\004\022\017\n\013PAYL"
     "OAD_REQ\020\005\022\022\n\016PAYLOAD_RESULT\020\006\022\014\n\010SET_GUI"
@@ -275,13 +275,13 @@ const char descriptor_table_protodef_messages_2eproto[] ABSL_ATTRIBUTE_SECTION_V
     "\020\t\022\026\n\022PLAYER_LIST_RESULT\020\n\022\021\n\rTAKE_FAIRS"
     "HOT\020\013\022\024\n\020REQUEST_FAIRSHOT\020\014\022\r\n\tHEARTBEAT"
     "\020\r\022\027\n\023UPDATE_PLAYER_STATE\020\016\022\020\n\014GET_GUID_"
-    "REQ\020\017b\006proto3"
+    "REQ\020\017\022\020\n\014FAIRSHOT_ACK\020\020b\006proto3"
 };
 static ::absl::once_flag descriptor_table_messages_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_messages_2eproto = {
     false,
     false,
-    893,
+    911,
     descriptor_table_protodef_messages_2eproto,
     "messages.proto",
     &descriptor_table_messages_2eproto_once,
@@ -300,7 +300,7 @@ const ::google::protobuf::EnumDescriptor* PROTOBUF_NONNULL ActionType_descriptor
   return file_level_enum_descriptors_messages_2eproto[0];
 }
 PROTOBUF_CONSTINIT const uint32_t ActionType_internal_data_[] = {
-    1048576u, 0u, };
+    1114112u, 0u, };
 // ===================================================================
 
 class Player::_Internal {
