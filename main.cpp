@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
     std::thread urlThread = UrlLauncher::StartPrimaryListener(bus, globalRunning);
 
-    NetworkCallbacks::Register(bus, ctx, netClient, ipcServer, broker, generatedSignature);
+    NetworkCallbacks::Register(bus, ctx, netClient, ipcServer, broker, hardwareId, generatedSignature);
 
     broker.Start(netClient, ipcServer);
 

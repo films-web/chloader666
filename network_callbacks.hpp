@@ -13,17 +13,18 @@
 #include "messages.pb.h"
 
 namespace NetworkCallbacks {
-    static __forceinline void Register(EventBus& bus, SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker,
+    static __forceinline void Register(EventBus& bus, SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker, const std::string& hardwareId,
         const std::string& signature) {
 
         netClient.Start(std::string(Constants::WsUrl().c_str()),
-            [&bus, &broker, signature](bool isConnected, const std::string& errorMsg) {
+            [&bus, &broker, signature, hardwareId](bool isConnected, const std::string& errorMsg) {
                 broker.SetNetworkStatus(isConnected);
 
                 if (isConnected) {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::LOADING, std::string(PCrypt("Authenticating...").c_str())) });
                     CheatHaram::C2S_Message authMsg;
                     authMsg.set_action(CheatHaram::ActionType::AUTH_REQUEST);
+                    authMsg.set_hwid(hardwareId);
                     authMsg.set_signature(signature);
 
                     broker.PushToWS(authMsg);
