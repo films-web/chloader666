@@ -13,7 +13,7 @@
 #include "messages.pb.h"
 
 namespace NetworkCallbacks {
-    inline void Register(EventBus& bus, SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker,
+    static __forceinline void Register(EventBus& bus, SessionContext& ctx, NetworkClient& netClient, IPCServer& ipcServer, MessageBroker& broker,
         const std::string& signature) {
 
         netClient.Start(std::string(Constants::WsUrl().c_str()),
@@ -51,7 +51,8 @@ namespace NetworkCallbacks {
                     bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Active").c_str())) });
                     std::string startupIp = ctx.GetTargetServer();
                     if (!startupIp.empty()) {
-                        broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_CONNECT_SERVER, "connect " + startupIp + "\n"));
+                        std::string connectCmd = std::string(PCrypt("connect ").c_str()) + startupIp + PCrypt("\n").c_str();
+                        broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_CONNECT_SERVER, connectCmd));
                     }
                 }
                 else {
