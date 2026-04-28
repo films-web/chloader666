@@ -24,6 +24,7 @@ public:
         std::vector<BYTE> iv(16, 0);
         std::vector<BYTE> ivCopy;
         std::vector<BYTE> ciphertext;
+
         if (!NT_SUCCESS(BCryptGenRandom(NULL, iv.data(), 16, BCRYPT_USE_SYSTEM_PREFERRED_RNG))) goto Cleanup;
 
         ivCopy = iv;
@@ -36,10 +37,12 @@ public:
         pbKeyObject = new BYTE[cbKeyObject];
         if (!NT_SUCCESS(BCryptGenerateSymmetricKey(hAlg, &hKey, pbKeyObject, cbKeyObject, (PBYTE)keyStr.data(), (ULONG)keyStr.size(), 0))) goto Cleanup;
 
-        if (!NT_SUCCESS(BCryptEncrypt(hKey, (PBYTE)plaintext.data(), (ULONG)plaintext.size(), NULL, iv.data(), 16, NULL, 0, &cbCiphertext, BCRYPT_BLOCK_PADDING))) goto Cleanup;
+        cbCiphertext = (DWORD)(plaintext.size() + cbBlockLen);
+        ciphertext.resize(cbCiphertext);
+
+        if (!NT_SUCCESS(BCryptEncrypt(hKey, (PBYTE)plaintext.data(), (ULONG)plaintext.size(), NULL, iv.data(), 16, ciphertext.data(), cbCiphertext, &cbCiphertext, BCRYPT_BLOCK_PADDING))) goto Cleanup;
 
         ciphertext.resize(cbCiphertext);
-        if (!NT_SUCCESS(BCryptEncrypt(hKey, (PBYTE)plaintext.data(), (ULONG)plaintext.size(), NULL, iv.data(), 16, ciphertext.data(), cbCiphertext, &cbCiphertext, BCRYPT_BLOCK_PADDING))) goto Cleanup;
 
         {
             std::vector<BYTE> finalPayload;
@@ -78,9 +81,9 @@ public:
         pbKeyObject = new BYTE[cbKeyObject];
         if (!NT_SUCCESS(BCryptGenerateSymmetricKey(hAlg, &hKey, pbKeyObject, cbKeyObject, (PBYTE)keyStr.data(), (ULONG)keyStr.size(), 0))) goto Cleanup;
 
-        if (!NT_SUCCESS(BCryptDecrypt(hKey, ciphertext.data(), (ULONG)ciphertext.size(), NULL, iv.data(), 16, NULL, 0, &cbPlaintext, BCRYPT_BLOCK_PADDING))) goto Cleanup;
-
+        cbPlaintext = (DWORD)ciphertext.size();
         plaintext.resize(cbPlaintext);
+
         if (NT_SUCCESS(BCryptDecrypt(hKey, ciphertext.data(), (ULONG)ciphertext.size(), NULL, iv.data(), 16, plaintext.data(), cbPlaintext, &cbPlaintext, BCRYPT_BLOCK_PADDING))) {
             result = std::string((char*)plaintext.data(), cbPlaintext);
         }

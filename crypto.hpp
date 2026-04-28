@@ -48,7 +48,6 @@ namespace Crypto {
     }
 
     __forceinline std::vector<unsigned char> Base64Decode(const std::string& in) {
-        // ENCRYPTED: Hide the Base64 lookup table.
         auto b64 = PCrypt("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
         std::vector<unsigned char> out;
         std::vector<int> T(256, -1);
@@ -58,7 +57,8 @@ namespace Crypto {
             if (T[c] == -1) break;
             val = (val << 6) + T[c];
             valb += 6;
-            if (valb >= 0) {
+
+            while (valb >= 0) {
                 out.push_back(char((val >> valb) & 0xFF));
                 valb -= 8;
             }
