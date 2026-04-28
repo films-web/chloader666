@@ -8,6 +8,19 @@
 #include "session_context.hpp"
 
 namespace ConsoleUI {
+    inline void Initialize() {
+        HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+        DWORD prev_mode;
+        GetConsoleMode(hInput, &prev_mode);
+        SetConsoleMode(hInput, ENABLE_EXTENDED_FLAGS | (prev_mode & ~ENABLE_QUICK_EDIT_MODE));
+        HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_CURSOR_INFO cursorInfo;
+        GetConsoleCursorInfo(hOutput, &cursorInfo);
+        cursorInfo.bVisible = false;
+        SetConsoleCursorInfo(hOutput, &cursorInfo);
+        SetConsoleTitleA("CheatHaram");
+    }
+
     inline void Register(EventBus& bus, SessionContext& ctx) {
         bus.Subscribe(EventType::UI_STATUS_UPDATE, [&ctx](const Event& e) {
 
