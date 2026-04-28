@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+
 #include "poly_crypt.hpp"
 
 class DllIntegrity {
@@ -15,13 +16,13 @@ private:
     static inline DWORD_PTR textBaseAddress = 0;
     static inline DWORD textSectionSize = 0;
 
-    static uint32_t HashBuffer(const BYTE* data, size_t size) {
+    static __forceinline uint32_t HashBuffer(const BYTE* data, size_t size) {
         uint32_t hash = 0x811c9dc5;
         for (size_t i = 0; i < size; ++i) { hash ^= data[i]; hash *= 0x01000193; }
         return hash;
     }
 
-    static uint32_t CalculateRemoteHash() {
+    static __forceinline uint32_t CalculateRemoteHash() {
         if (textBaseAddress == 0 || textSectionSize == 0) return 0;
         HANDLE hProc = OpenProcess(PROCESS_VM_READ, FALSE, targetPID);
         if (!hProc) return 0;
@@ -34,7 +35,7 @@ private:
     }
 
 public:
-    static void InitializeAndHash(HANDLE hProc, DWORD pid, DWORD_PTR baseAddr) {
+    static __forceinline void InitializeAndHash(HANDLE hProc, DWORD pid, DWORD_PTR baseAddr) {
         targetPID = pid;
         textBaseAddress = 0;
         textSectionSize = 0;
@@ -65,7 +66,7 @@ public:
         }
     }
 
-    static void Start() {
+    static __forceinline void Start() {
         if (baselineHash == 0) return;
 
         isRunning = true;
@@ -82,5 +83,5 @@ public:
             }).detach();
     }
 
-    static void Stop() { isRunning = false; }
+    static __forceinline void Stop() { isRunning = false; }
 };
