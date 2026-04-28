@@ -8,14 +8,14 @@
 
 class SecureProtocol {
 public:
-    static std::string Pack(CheatHaram::C2S_Message& msg) {
+    static __forceinline std::string Pack(CheatHaram::C2S_Message& msg) {
         msg.set_timestamp(static_cast<uint64_t>(std::time(nullptr)));
         std::string serializedData;
         if (!msg.SerializeToString(&serializedData)) return "";
         return AESCrypt::Encrypt(serializedData, Constants::AesTransportKey().c_str());
     }
 
-    static bool Unpack(const std::string& encryptedPayload, CheatHaram::S2C_Message& outMsg) {
+    static __forceinline bool Unpack(const std::string& encryptedPayload, CheatHaram::S2C_Message& outMsg) {
         std::string decryptedData = AESCrypt::Decrypt(encryptedPayload, Constants::AesTransportKey().c_str());
         if (decryptedData.empty()) return false;
         return outMsg.ParseFromString(decryptedData);
