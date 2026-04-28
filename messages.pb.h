@@ -1071,9 +1071,10 @@ class C2S_Message final : public ::google::protobuf::Message
   // accessors -------------------------------------------------------
   enum : int {
     kSignatureFieldNumber = 3,
-    kImageDataFieldNumber = 5,
-    kTargetFieldNumber = 6,
-    kPlayerDataFieldNumber = 4,
+    kHwidFieldNumber = 4,
+    kImageDataFieldNumber = 6,
+    kTargetFieldNumber = 7,
+    kPlayerDataFieldNumber = 5,
     kTimestampFieldNumber = 2,
     kActionFieldNumber = 1,
   };
@@ -1092,7 +1093,22 @@ class C2S_Message final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_signature();
 
   public:
-  // bytes image_data = 5;
+  // string hwid = 4;
+  void clear_hwid() ;
+  const ::std::string& hwid() const;
+  template <typename Arg_ = const ::std::string&, typename... Args_>
+  void set_hwid(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_hwid();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_hwid();
+  void set_allocated_hwid(::std::string* PROTOBUF_NULLABLE value);
+
+  private:
+  const ::std::string& _internal_hwid() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_hwid(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_hwid();
+
+  public:
+  // bytes image_data = 6;
   void clear_image_data() ;
   const ::std::string& image_data() const;
   template <typename Arg_ = const ::std::string&, typename... Args_>
@@ -1107,7 +1123,7 @@ class C2S_Message final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_image_data();
 
   public:
-  // string target = 6;
+  // string target = 7;
   void clear_target() ;
   const ::std::string& target() const;
   template <typename Arg_ = const ::std::string&, typename... Args_>
@@ -1122,7 +1138,7 @@ class C2S_Message final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_target();
 
   public:
-  // .CheatHaram.PlayerData player_data = 4;
+  // .CheatHaram.PlayerData player_data = 5;
   bool has_player_data() const;
   void clear_player_data() ;
   const ::CheatHaram::PlayerData& player_data() const;
@@ -1161,8 +1177,8 @@ class C2S_Message final : public ::google::protobuf::Message
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<3, 6,
-                                   1, 46,
+  static const ::google::protobuf::internal::TcParseTable<3, 7,
+                                   1, 50,
                                    2>
       _table_;
 
@@ -1184,6 +1200,7 @@ class C2S_Message final : public ::google::protobuf::Message
     ::google::protobuf::internal::HasBits<1> _has_bits_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::google::protobuf::internal::ArenaStringPtr signature_;
+    ::google::protobuf::internal::ArenaStringPtr hwid_;
     ::google::protobuf::internal::ArenaStringPtr image_data_;
     ::google::protobuf::internal::ArenaStringPtr target_;
     ::CheatHaram::PlayerData* PROTOBUF_NULLABLE player_data_;
@@ -1561,7 +1578,7 @@ inline void C2S_Message::clear_action() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.action_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000020U);
+                  0x00000040U);
 }
 inline ::CheatHaram::ActionType C2S_Message::action() const {
   // @@protoc_insertion_point(field_get:CheatHaram.C2S_Message.action)
@@ -1569,7 +1586,7 @@ inline ::CheatHaram::ActionType C2S_Message::action() const {
 }
 inline void C2S_Message::set_action(::CheatHaram::ActionType value) {
   _internal_set_action(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000020U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000040U);
   // @@protoc_insertion_point(field_set:CheatHaram.C2S_Message.action)
 }
 inline ::CheatHaram::ActionType C2S_Message::_internal_action() const {
@@ -1586,7 +1603,7 @@ inline void C2S_Message::clear_timestamp() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.timestamp_ = ::uint64_t{0u};
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000010U);
+                  0x00000020U);
 }
 inline ::uint64_t C2S_Message::timestamp() const {
   // @@protoc_insertion_point(field_get:CheatHaram.C2S_Message.timestamp)
@@ -1594,7 +1611,7 @@ inline ::uint64_t C2S_Message::timestamp() const {
 }
 inline void C2S_Message::set_timestamp(::uint64_t value) {
   _internal_set_timestamp(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000020U);
   // @@protoc_insertion_point(field_set:CheatHaram.C2S_Message.timestamp)
 }
 inline ::uint64_t C2S_Message::_internal_timestamp() const {
@@ -1671,9 +1688,74 @@ inline void C2S_Message::set_allocated_signature(::std::string* PROTOBUF_NULLABL
   // @@protoc_insertion_point(field_set_allocated:CheatHaram.C2S_Message.signature)
 }
 
-// .CheatHaram.PlayerData player_data = 4;
+// string hwid = 4;
+inline void C2S_Message::clear_hwid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.hwid_.ClearToEmpty();
+  ClearHasBit(_impl_._has_bits_[0],
+                  0x00000002U);
+}
+inline const ::std::string& C2S_Message::hwid() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:CheatHaram.C2S_Message.hwid)
+  return _internal_hwid();
+}
+template <typename Arg_, typename... Args_>
+PROTOBUF_ALWAYS_INLINE void C2S_Message::set_hwid(Arg_&& arg, Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  SetHasBit(_impl_._has_bits_[0], 0x00000002U);
+  _impl_.hwid_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:CheatHaram.C2S_Message.hwid)
+}
+inline ::std::string* PROTOBUF_NONNULL C2S_Message::mutable_hwid()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  SetHasBit(_impl_._has_bits_[0], 0x00000002U);
+  ::std::string* _s = _internal_mutable_hwid();
+  // @@protoc_insertion_point(field_mutable:CheatHaram.C2S_Message.hwid)
+  return _s;
+}
+inline const ::std::string& C2S_Message::_internal_hwid() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.hwid_.Get();
+}
+inline void C2S_Message::_internal_set_hwid(const ::std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.hwid_.Set(value, GetArena());
+}
+inline ::std::string* PROTOBUF_NONNULL C2S_Message::_internal_mutable_hwid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.hwid_.Mutable( GetArena());
+}
+inline ::std::string* PROTOBUF_NULLABLE C2S_Message::release_hwid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:CheatHaram.C2S_Message.hwid)
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000002U)) {
+    return nullptr;
+  }
+  ClearHasBit(_impl_._has_bits_[0], 0x00000002U);
+  auto* released = _impl_.hwid_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.hwid_.Set("", GetArena());
+  }
+  return released;
+}
+inline void C2S_Message::set_allocated_hwid(::std::string* PROTOBUF_NULLABLE value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    SetHasBit(_impl_._has_bits_[0], 0x00000002U);
+  } else {
+    ClearHasBit(_impl_._has_bits_[0], 0x00000002U);
+  }
+  _impl_.hwid_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.hwid_.IsDefault()) {
+    _impl_.hwid_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:CheatHaram.C2S_Message.hwid)
+}
+
+// .CheatHaram.PlayerData player_data = 5;
 inline bool C2S_Message::has_player_data() const {
-  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00000008U);
+  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00000010U);
   PROTOBUF_ASSUME(!value || _impl_.player_data_ != nullptr);
   return value;
 }
@@ -1681,7 +1763,7 @@ inline void C2S_Message::clear_player_data() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.player_data_ != nullptr) _impl_.player_data_->Clear();
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000008U);
+                  0x00000010U);
 }
 inline const ::CheatHaram::PlayerData& C2S_Message::_internal_player_data() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
@@ -1700,16 +1782,16 @@ inline void C2S_Message::unsafe_arena_set_allocated_player_data(
   }
   _impl_.player_data_ = reinterpret_cast<::CheatHaram::PlayerData*>(value);
   if (value != nullptr) {
-    SetHasBit(_impl_._has_bits_[0], 0x00000008U);
+    SetHasBit(_impl_._has_bits_[0], 0x00000010U);
   } else {
-    ClearHasBit(_impl_._has_bits_[0], 0x00000008U);
+    ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:CheatHaram.C2S_Message.player_data)
 }
 inline ::CheatHaram::PlayerData* PROTOBUF_NULLABLE C2S_Message::release_player_data() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
-  ClearHasBit(_impl_._has_bits_[0], 0x00000008U);
+  ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
   ::CheatHaram::PlayerData* released = _impl_.player_data_;
   _impl_.player_data_ = nullptr;
   if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
@@ -1729,7 +1811,7 @@ inline ::CheatHaram::PlayerData* PROTOBUF_NULLABLE C2S_Message::unsafe_arena_rel
   ::google::protobuf::internal::TSanWrite(&_impl_);
   // @@protoc_insertion_point(field_release:CheatHaram.C2S_Message.player_data)
 
-  ClearHasBit(_impl_._has_bits_[0], 0x00000008U);
+  ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
   ::CheatHaram::PlayerData* temp = _impl_.player_data_;
   _impl_.player_data_ = nullptr;
   return temp;
@@ -1744,7 +1826,7 @@ inline ::CheatHaram::PlayerData* PROTOBUF_NONNULL C2S_Message::_internal_mutable
 }
 inline ::CheatHaram::PlayerData* PROTOBUF_NONNULL C2S_Message::mutable_player_data()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  SetHasBit(_impl_._has_bits_[0], 0x00000008U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
   ::CheatHaram::PlayerData* _msg = _internal_mutable_player_data();
   // @@protoc_insertion_point(field_mutable:CheatHaram.C2S_Message.player_data)
   return _msg;
@@ -1761,21 +1843,21 @@ inline void C2S_Message::set_allocated_player_data(::CheatHaram::PlayerData* PRO
     if (message_arena != submessage_arena) {
       value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
     }
-    SetHasBit(_impl_._has_bits_[0], 0x00000008U);
+    SetHasBit(_impl_._has_bits_[0], 0x00000010U);
   } else {
-    ClearHasBit(_impl_._has_bits_[0], 0x00000008U);
+    ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
   }
 
   _impl_.player_data_ = reinterpret_cast<::CheatHaram::PlayerData*>(value);
   // @@protoc_insertion_point(field_set_allocated:CheatHaram.C2S_Message.player_data)
 }
 
-// bytes image_data = 5;
+// bytes image_data = 6;
 inline void C2S_Message::clear_image_data() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.image_data_.ClearToEmpty();
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000002U);
+                  0x00000004U);
 }
 inline const ::std::string& C2S_Message::image_data() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
@@ -1785,13 +1867,13 @@ inline const ::std::string& C2S_Message::image_data() const
 template <typename Arg_, typename... Args_>
 PROTOBUF_ALWAYS_INLINE void C2S_Message::set_image_data(Arg_&& arg, Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  SetHasBit(_impl_._has_bits_[0], 0x00000002U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000004U);
   _impl_.image_data_.SetBytes(static_cast<Arg_&&>(arg), args..., GetArena());
   // @@protoc_insertion_point(field_set:CheatHaram.C2S_Message.image_data)
 }
 inline ::std::string* PROTOBUF_NONNULL C2S_Message::mutable_image_data()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  SetHasBit(_impl_._has_bits_[0], 0x00000002U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000004U);
   ::std::string* _s = _internal_mutable_image_data();
   // @@protoc_insertion_point(field_mutable:CheatHaram.C2S_Message.image_data)
   return _s;
@@ -1811,10 +1893,10 @@ inline ::std::string* PROTOBUF_NONNULL C2S_Message::_internal_mutable_image_data
 inline ::std::string* PROTOBUF_NULLABLE C2S_Message::release_image_data() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   // @@protoc_insertion_point(field_release:CheatHaram.C2S_Message.image_data)
-  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000002U)) {
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000004U)) {
     return nullptr;
   }
-  ClearHasBit(_impl_._has_bits_[0], 0x00000002U);
+  ClearHasBit(_impl_._has_bits_[0], 0x00000004U);
   auto* released = _impl_.image_data_.Release();
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
     _impl_.image_data_.Set("", GetArena());
@@ -1824,9 +1906,9 @@ inline ::std::string* PROTOBUF_NULLABLE C2S_Message::release_image_data() {
 inline void C2S_Message::set_allocated_image_data(::std::string* PROTOBUF_NULLABLE value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (value != nullptr) {
-    SetHasBit(_impl_._has_bits_[0], 0x00000002U);
+    SetHasBit(_impl_._has_bits_[0], 0x00000004U);
   } else {
-    ClearHasBit(_impl_._has_bits_[0], 0x00000002U);
+    ClearHasBit(_impl_._has_bits_[0], 0x00000004U);
   }
   _impl_.image_data_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.image_data_.IsDefault()) {
@@ -1835,12 +1917,12 @@ inline void C2S_Message::set_allocated_image_data(::std::string* PROTOBUF_NULLAB
   // @@protoc_insertion_point(field_set_allocated:CheatHaram.C2S_Message.image_data)
 }
 
-// string target = 6;
+// string target = 7;
 inline void C2S_Message::clear_target() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.target_.ClearToEmpty();
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000004U);
+                  0x00000008U);
 }
 inline const ::std::string& C2S_Message::target() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
@@ -1850,13 +1932,13 @@ inline const ::std::string& C2S_Message::target() const
 template <typename Arg_, typename... Args_>
 PROTOBUF_ALWAYS_INLINE void C2S_Message::set_target(Arg_&& arg, Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  SetHasBit(_impl_._has_bits_[0], 0x00000004U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000008U);
   _impl_.target_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
   // @@protoc_insertion_point(field_set:CheatHaram.C2S_Message.target)
 }
 inline ::std::string* PROTOBUF_NONNULL C2S_Message::mutable_target()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  SetHasBit(_impl_._has_bits_[0], 0x00000004U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000008U);
   ::std::string* _s = _internal_mutable_target();
   // @@protoc_insertion_point(field_mutable:CheatHaram.C2S_Message.target)
   return _s;
@@ -1876,10 +1958,10 @@ inline ::std::string* PROTOBUF_NONNULL C2S_Message::_internal_mutable_target() {
 inline ::std::string* PROTOBUF_NULLABLE C2S_Message::release_target() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   // @@protoc_insertion_point(field_release:CheatHaram.C2S_Message.target)
-  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000004U)) {
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000008U)) {
     return nullptr;
   }
-  ClearHasBit(_impl_._has_bits_[0], 0x00000004U);
+  ClearHasBit(_impl_._has_bits_[0], 0x00000008U);
   auto* released = _impl_.target_.Release();
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
     _impl_.target_.Set("", GetArena());
@@ -1889,9 +1971,9 @@ inline ::std::string* PROTOBUF_NULLABLE C2S_Message::release_target() {
 inline void C2S_Message::set_allocated_target(::std::string* PROTOBUF_NULLABLE value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (value != nullptr) {
-    SetHasBit(_impl_._has_bits_[0], 0x00000004U);
+    SetHasBit(_impl_._has_bits_[0], 0x00000008U);
   } else {
-    ClearHasBit(_impl_._has_bits_[0], 0x00000004U);
+    ClearHasBit(_impl_._has_bits_[0], 0x00000008U);
   }
   _impl_.target_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.target_.IsDefault()) {

@@ -138,6 +138,9 @@ inline constexpr C2S_Message::Impl_::Impl_(
         signature_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        hwid_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         image_data_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
@@ -197,19 +200,21 @@ const ::uint32_t
         3,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_._has_bits_),
-        9, // hasbit index offset
+        10, // hasbit index offset
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.action_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.timestamp_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.signature_),
+        PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.hwid_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.player_data_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.image_data_),
         PROTOBUF_FIELD_OFFSET(::CheatHaram::C2S_Message, _impl_.target_),
+        6,
         5,
-        4,
         0,
-        3,
         1,
+        4,
         2,
+        3,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::CheatHaram::S2C_Message, _impl_._has_bits_),
         12, // hasbit index offset
@@ -238,7 +243,7 @@ static const ::_pbi::MigrationSchema
         {0, sizeof(::CheatHaram::Player)},
         {9, sizeof(::CheatHaram::PlayerData)},
         {20, sizeof(::CheatHaram::C2S_Message)},
-        {35, sizeof(::CheatHaram::S2C_Message)},
+        {37, sizeof(::CheatHaram::S2C_Message)},
 };
 static const ::_pb::Message* PROTOBUF_NONNULL const file_default_instances[] = {
     &::CheatHaram::_Player_default_instance_._instance,
@@ -251,31 +256,32 @@ const char descriptor_table_protodef_messages_2eproto[] ABSL_ATTRIBUTE_SECTION_V
     "\n\016messages.proto\022\nCheatHaram\"0\n\006Player\022\n"
     "\n\002id\030\001 \001(\005\022\014\n\004guid\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\"J"
     "\n\nPlayerData\022\n\n\002id\030\001 \001(\005\022\014\n\004name\030\002 \001(\t\022\021"
-    "\n\tserver_ip\030\003 \001(\t\022\017\n\007in_game\030\004 \001(\010\"\254\001\n\013C"
+    "\n\tserver_ip\030\003 \001(\t\022\017\n\007in_game\030\004 \001(\010\"\272\001\n\013C"
     "2S_Message\022&\n\006action\030\001 \001(\0162\026.CheatHaram."
     "ActionType\022\021\n\ttimestamp\030\002 \001(\004\022\021\n\tsignatu"
-    "re\030\003 \001(\t\022+\n\013player_data\030\004 \001(\0132\026.CheatHar"
-    "am.PlayerData\022\022\n\nimage_data\030\005 \001(\014\022\016\n\006tar"
-    "get\030\006 \001(\t\"\326\001\n\013S2C_Message\022&\n\006action\030\001 \001("
-    "\0162\026.CheatHaram.ActionType\022\017\n\007success\030\002 \001"
-    "(\010\022\017\n\007message\030\003 \001(\t\022\014\n\004guid\030\004 \001(\t\022\016\n\006has"
-    "hes\030\005 \003(\t\022\021\n\tdll_bytes\030\006 \001(\t\022\020\n\010dll_hash"
-    "\030\007 \001(\t\022\020\n\010dll_name\030\010 \001(\t\022(\n\014players_list"
-    "\030\t \003(\0132\022.CheatHaram.Player*\302\002\n\nActionTyp"
-    "e\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQUEST\020\001\022\017\n\013AUTH"
-    "_RESULT\020\002\022\025\n\021PK3_WHITELIST_REQ\020\003\022\030\n\024PK3_"
-    "WHITELIST_RESULT\020\004\022\017\n\013PAYLOAD_REQ\020\005\022\022\n\016P"
-    "AYLOAD_RESULT\020\006\022\014\n\010SET_GUID\020\007\022\020\n\014CRASH_C"
-    "LIENT\020\010\022\023\n\017PLAYER_LIST_REQ\020\t\022\026\n\022PLAYER_L"
-    "IST_RESULT\020\n\022\021\n\rTAKE_FAIRSHOT\020\013\022\024\n\020REQUE"
-    "ST_FAIRSHOT\020\014\022\r\n\tHEARTBEAT\020\r\022\027\n\023UPDATE_P"
-    "LAYER_STATE\020\016\022\020\n\014GET_GUID_REQ\020\017b\006proto3"
+    "re\030\003 \001(\t\022\014\n\004hwid\030\004 \001(\t\022+\n\013player_data\030\005 "
+    "\001(\0132\026.CheatHaram.PlayerData\022\022\n\nimage_dat"
+    "a\030\006 \001(\014\022\016\n\006target\030\007 \001(\t\"\326\001\n\013S2C_Message\022"
+    "&\n\006action\030\001 \001(\0162\026.CheatHaram.ActionType\022"
+    "\017\n\007success\030\002 \001(\010\022\017\n\007message\030\003 \001(\t\022\014\n\004gui"
+    "d\030\004 \001(\t\022\016\n\006hashes\030\005 \003(\t\022\021\n\tdll_bytes\030\006 \001"
+    "(\t\022\020\n\010dll_hash\030\007 \001(\t\022\020\n\010dll_name\030\010 \001(\t\022("
+    "\n\014players_list\030\t \003(\0132\022.CheatHaram.Player"
+    "*\302\002\n\nActionType\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQ"
+    "UEST\020\001\022\017\n\013AUTH_RESULT\020\002\022\025\n\021PK3_WHITELIST"
+    "_REQ\020\003\022\030\n\024PK3_WHITELIST_RESULT\020\004\022\017\n\013PAYL"
+    "OAD_REQ\020\005\022\022\n\016PAYLOAD_RESULT\020\006\022\014\n\010SET_GUI"
+    "D\020\007\022\020\n\014CRASH_CLIENT\020\010\022\023\n\017PLAYER_LIST_REQ"
+    "\020\t\022\026\n\022PLAYER_LIST_RESULT\020\n\022\021\n\rTAKE_FAIRS"
+    "HOT\020\013\022\024\n\020REQUEST_FAIRSHOT\020\014\022\r\n\tHEARTBEAT"
+    "\020\r\022\027\n\023UPDATE_PLAYER_STATE\020\016\022\020\n\014GET_GUID_"
+    "REQ\020\017b\006proto3"
 };
 static ::absl::once_flag descriptor_table_messages_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_messages_2eproto = {
     false,
     false,
-    879,
+    893,
     descriptor_table_protodef_messages_2eproto,
     "messages.proto",
     &descriptor_table_messages_2eproto_once,
@@ -1070,6 +1076,7 @@ PROTOBUF_NDEBUG_INLINE C2S_Message::Impl_::Impl_(
       : _has_bits_{from._has_bits_},
         _cached_size_{0},
         signature_(arena, from.signature_),
+        hwid_(arena, from.hwid_),
         image_data_(arena, from.image_data_),
         target_(arena, from.target_) {}
 
@@ -1087,7 +1094,7 @@ C2S_Message::C2S_Message(
       from._internal_metadata_);
   new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
   ::uint32_t cached_has_bits = _impl_._has_bits_[0];
-  _impl_.player_data_ = (CheckHasBit(cached_has_bits, 0x00000008U))
+  _impl_.player_data_ = (CheckHasBit(cached_has_bits, 0x00000010U))
                 ? ::google::protobuf::Message::CopyConstruct(arena, *from._impl_.player_data_)
                 : nullptr;
   ::memcpy(reinterpret_cast<char*>(&_impl_) +
@@ -1105,6 +1112,7 @@ PROTOBUF_NDEBUG_INLINE C2S_Message::Impl_::Impl_(
     [[maybe_unused]] ::google::protobuf::Arena* PROTOBUF_NULLABLE arena)
       : _cached_size_{0},
         signature_(arena),
+        hwid_(arena),
         image_data_(arena),
         target_(arena) {}
 
@@ -1129,6 +1137,7 @@ inline void C2S_Message::SharedDtor(MessageLite& self) {
   this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   ABSL_DCHECK(this_.GetArena() == nullptr);
   this_._impl_.signature_.Destroy();
+  this_._impl_.hwid_.Destroy();
   this_._impl_.image_data_.Destroy();
   this_._impl_.target_.Destroy();
   delete this_._impl_.player_data_;
@@ -1178,16 +1187,16 @@ C2S_Message::GetClassData() const {
   return C2S_Message_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 6, 1, 46, 2>
+const ::_pbi::TcParseTable<3, 7, 1, 50, 2>
 C2S_Message::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_._has_bits_),
     0, // no _extensions_
-    6, 56,  // max_field_number, fast_idx_mask
+    7, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967232,  // skipmap
+    4294967168,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    6,  // num_field_entries
+    7,  // num_field_entries
     1,  // num_aux_entries
     offsetof(decltype(_table_), aux_entries),
     C2S_Message_class_data_.base(),
@@ -1199,53 +1208,59 @@ C2S_Message::_table_ = {
   }, {{
     {::_pbi::TcParser::MiniParse, {}},
     // .CheatHaram.ActionType action = 1;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(C2S_Message, _impl_.action_), 5>(),
-     {8, 5, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(C2S_Message, _impl_.action_), 6>(),
+     {8, 6, 0,
       PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.action_)}},
     // uint64 timestamp = 2;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(C2S_Message, _impl_.timestamp_), 4>(),
-     {16, 4, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(C2S_Message, _impl_.timestamp_), 5>(),
+     {16, 5, 0,
       PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.timestamp_)}},
     // string signature = 3;
     {::_pbi::TcParser::FastUS1,
      {26, 0, 0,
       PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.signature_)}},
-    // .CheatHaram.PlayerData player_data = 4;
-    {::_pbi::TcParser::FastMtS1,
-     {34, 3, 0,
-      PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.player_data_)}},
-    // bytes image_data = 5;
-    {::_pbi::TcParser::FastBS1,
-     {42, 1, 0,
-      PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.image_data_)}},
-    // string target = 6;
+    // string hwid = 4;
     {::_pbi::TcParser::FastUS1,
+     {34, 1, 0,
+      PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.hwid_)}},
+    // .CheatHaram.PlayerData player_data = 5;
+    {::_pbi::TcParser::FastMtS1,
+     {42, 4, 0,
+      PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.player_data_)}},
+    // bytes image_data = 6;
+    {::_pbi::TcParser::FastBS1,
      {50, 2, 0,
+      PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.image_data_)}},
+    // string target = 7;
+    {::_pbi::TcParser::FastUS1,
+     {58, 3, 0,
       PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.target_)}},
-    {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
   }}, {{
     // .CheatHaram.ActionType action = 1;
-    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.action_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kOpenEnum)},
+    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.action_), _Internal::kHasBitsOffset + 6, 0, (0 | ::_fl::kFcOptional | ::_fl::kOpenEnum)},
     // uint64 timestamp = 2;
-    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.timestamp_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt64)},
+    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.timestamp_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt64)},
     // string signature = 3;
     {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.signature_), _Internal::kHasBitsOffset + 0, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
-    // .CheatHaram.PlayerData player_data = 4;
-    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.player_data_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
-    // bytes image_data = 5;
-    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.image_data_), _Internal::kHasBitsOffset + 1, 0, (0 | ::_fl::kFcOptional | ::_fl::kBytes | ::_fl::kRepAString)},
-    // string target = 6;
-    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.target_), _Internal::kHasBitsOffset + 2, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string hwid = 4;
+    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.hwid_), _Internal::kHasBitsOffset + 1, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // .CheatHaram.PlayerData player_data = 5;
+    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.player_data_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // bytes image_data = 6;
+    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.image_data_), _Internal::kHasBitsOffset + 2, 0, (0 | ::_fl::kFcOptional | ::_fl::kBytes | ::_fl::kRepAString)},
+    // string target = 7;
+    {PROTOBUF_FIELD_OFFSET(C2S_Message, _impl_.target_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   {{
       {::_pbi::TcParser::GetTable<::CheatHaram::PlayerData>()},
   }},
   {{
-    "\26\0\0\11\0\0\6\0"
+    "\26\0\0\11\4\0\0\6"
     "CheatHaram.C2S_Message"
     "signature"
+    "hwid"
     "target"
   }},
 };
@@ -1257,22 +1272,25 @@ PROTOBUF_NOINLINE void C2S_Message::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000000fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       _impl_.signature_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000002U)) {
-      _impl_.image_data_.ClearNonDefaultToEmpty();
+      _impl_.hwid_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000004U)) {
-      _impl_.target_.ClearNonDefaultToEmpty();
+      _impl_.image_data_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000008U)) {
+      _impl_.target_.ClearNonDefaultToEmpty();
+    }
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
       ABSL_DCHECK(_impl_.player_data_ != nullptr);
       _impl_.player_data_->Clear();
     }
   }
-  if (BatchCheckHasBit(cached_has_bits, 0x00000030U)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x00000060U)) {
     ::memset(&_impl_.timestamp_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.action_) -
         reinterpret_cast<char*>(&_impl_.timestamp_)) + sizeof(_impl_.action_));
@@ -1301,7 +1319,7 @@ PROTOBUF_NOINLINE void C2S_Message::Clear() {
 
   cached_has_bits = this_._impl_._has_bits_[0];
   // .CheatHaram.ActionType action = 1;
-  if (CheckHasBit(cached_has_bits, 0x00000020U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000040U)) {
     if (this_._internal_action() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteEnumToArray(
@@ -1310,7 +1328,7 @@ PROTOBUF_NOINLINE void C2S_Message::Clear() {
   }
 
   // uint64 timestamp = 2;
-  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000020U)) {
     if (this_._internal_timestamp() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteUInt64ToArray(
@@ -1328,28 +1346,38 @@ PROTOBUF_NOINLINE void C2S_Message::Clear() {
     }
   }
 
-  // .CheatHaram.PlayerData player_data = 4;
-  if (CheckHasBit(cached_has_bits, 0x00000008U)) {
-    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
-        4, *this_._impl_.player_data_, this_._impl_.player_data_->GetCachedSize(), target,
-        stream);
-  }
-
-  // bytes image_data = 5;
+  // string hwid = 4;
   if (CheckHasBit(cached_has_bits, 0x00000002U)) {
-    if (!this_._internal_image_data().empty()) {
-      const ::std::string& _s = this_._internal_image_data();
-      target = stream->WriteBytesMaybeAliased(5, _s, target);
+    if (!this_._internal_hwid().empty()) {
+      const ::std::string& _s = this_._internal_hwid();
+      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.C2S_Message.hwid");
+      target = stream->WriteStringMaybeAliased(4, _s, target);
     }
   }
 
-  // string target = 6;
+  // .CheatHaram.PlayerData player_data = 5;
+  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        5, *this_._impl_.player_data_, this_._impl_.player_data_->GetCachedSize(), target,
+        stream);
+  }
+
+  // bytes image_data = 6;
   if (CheckHasBit(cached_has_bits, 0x00000004U)) {
+    if (!this_._internal_image_data().empty()) {
+      const ::std::string& _s = this_._internal_image_data();
+      target = stream->WriteBytesMaybeAliased(6, _s, target);
+    }
+  }
+
+  // string target = 7;
+  if (CheckHasBit(cached_has_bits, 0x00000008U)) {
     if (!this_._internal_target().empty()) {
       const ::std::string& _s = this_._internal_target();
       ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.C2S_Message.target");
-      target = stream->WriteStringMaybeAliased(6, _s, target);
+      target = stream->WriteStringMaybeAliased(7, _s, target);
     }
   }
 
@@ -1378,7 +1406,7 @@ PROTOBUF_NOINLINE void C2S_Message::Clear() {
 
   ::_pbi::Prefetch5LinesFrom7Lines(&this_);
   cached_has_bits = this_._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000003fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000007fU)) {
     // string signature = 3;
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!this_._internal_signature().empty()) {
@@ -1386,34 +1414,41 @@ PROTOBUF_NOINLINE void C2S_Message::Clear() {
                                         this_._internal_signature());
       }
     }
-    // bytes image_data = 5;
+    // string hwid = 4;
     if (CheckHasBit(cached_has_bits, 0x00000002U)) {
+      if (!this_._internal_hwid().empty()) {
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                        this_._internal_hwid());
+      }
+    }
+    // bytes image_data = 6;
+    if (CheckHasBit(cached_has_bits, 0x00000004U)) {
       if (!this_._internal_image_data().empty()) {
         total_size += 1 + ::google::protobuf::internal::WireFormatLite::BytesSize(
                                         this_._internal_image_data());
       }
     }
-    // string target = 6;
-    if (CheckHasBit(cached_has_bits, 0x00000004U)) {
+    // string target = 7;
+    if (CheckHasBit(cached_has_bits, 0x00000008U)) {
       if (!this_._internal_target().empty()) {
         total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                         this_._internal_target());
       }
     }
-    // .CheatHaram.PlayerData player_data = 4;
-    if (CheckHasBit(cached_has_bits, 0x00000008U)) {
+    // .CheatHaram.PlayerData player_data = 5;
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
       total_size += 1 +
                     ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.player_data_);
     }
     // uint64 timestamp = 2;
-    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
       if (this_._internal_timestamp() != 0) {
         total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(
             this_._internal_timestamp());
       }
     }
     // .CheatHaram.ActionType action = 1;
-    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000040U)) {
       if (this_._internal_action() != 0) {
         total_size += 1 +
                       ::_pbi::WireFormatLite::EnumSize(this_._internal_action());
@@ -1439,7 +1474,7 @@ void C2S_Message::MergeImpl(::google::protobuf::MessageLite& to_msg,
   (void)cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000003fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000007fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!from._internal_signature().empty()) {
         _this->_internal_set_signature(from._internal_signature());
@@ -1450,6 +1485,15 @@ void C2S_Message::MergeImpl(::google::protobuf::MessageLite& to_msg,
       }
     }
     if (CheckHasBit(cached_has_bits, 0x00000002U)) {
+      if (!from._internal_hwid().empty()) {
+        _this->_internal_set_hwid(from._internal_hwid());
+      } else {
+        if (_this->_impl_.hwid_.IsDefault()) {
+          _this->_internal_set_hwid("");
+        }
+      }
+    }
+    if (CheckHasBit(cached_has_bits, 0x00000004U)) {
       if (!from._internal_image_data().empty()) {
         _this->_internal_set_image_data(from._internal_image_data());
       } else {
@@ -1458,7 +1502,7 @@ void C2S_Message::MergeImpl(::google::protobuf::MessageLite& to_msg,
         }
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000004U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000008U)) {
       if (!from._internal_target().empty()) {
         _this->_internal_set_target(from._internal_target());
       } else {
@@ -1467,7 +1511,7 @@ void C2S_Message::MergeImpl(::google::protobuf::MessageLite& to_msg,
         }
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000008U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
       ABSL_DCHECK(from._impl_.player_data_ != nullptr);
       if (_this->_impl_.player_data_ == nullptr) {
         _this->_impl_.player_data_ = ::google::protobuf::Message::CopyConstruct(arena, *from._impl_.player_data_);
@@ -1475,12 +1519,12 @@ void C2S_Message::MergeImpl(::google::protobuf::MessageLite& to_msg,
         _this->_impl_.player_data_->MergeFrom(*from._impl_.player_data_);
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
       if (from._internal_timestamp() != 0) {
         _this->_impl_.timestamp_ = from._impl_.timestamp_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000040U)) {
       if (from._internal_action() != 0) {
         _this->_impl_.action_ = from._impl_.action_;
       }
@@ -1506,6 +1550,7 @@ void C2S_Message::InternalSwap(C2S_Message* PROTOBUF_RESTRICT PROTOBUF_NONNULL o
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.signature_, &other->_impl_.signature_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.hwid_, &other->_impl_.hwid_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.image_data_, &other->_impl_.image_data_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.target_, &other->_impl_.target_, arena);
   ::google::protobuf::internal::memswap<
