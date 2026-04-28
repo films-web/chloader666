@@ -58,7 +58,7 @@ public:
 
         bus.Subscribe(EventType::SCAN_COMPLETED, [&bus, &ctx, &broker](const Event&) {
             if (ctx.isInjected) {
-                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
+                // later
             }
             else {
                 bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::SUCCESS, std::string(PCrypt("Starting Game...").c_str())) });
