@@ -37,25 +37,24 @@ public:
         HWND hWnd = FindGameWindow(gamePid);
         if (!hWnd) return {};
 
+        if (IsIconic(hWnd)) {
+            return {};
+        }
+
         RECT clientRect;
         GetClientRect(hWnd, &clientRect);
 
-        POINT topLeft = { 0, 0 };
-        POINT bottomRight = { clientRect.right, clientRect.bottom };
-        ClientToScreen(hWnd, &topLeft);
-        ClientToScreen(hWnd, &bottomRight);
-
-        int width = bottomRight.x - topLeft.x;
-        int height = bottomRight.y - topLeft.y;
+        int width = clientRect.right - clientRect.left;
+        int height = clientRect.bottom - clientRect.top;
 
         if (width <= 0 || height <= 0) return {};
 
-        HDC hScreen = GetDC(NULL);
-        HDC hDC = CreateCompatibleDC(hScreen);
-        HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, width, height);
-        HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
+        HDC hWindowDC = GetDC(hWnd);
+        HDC hMemoryDC = CreateCompatibleDC(hWindowDC);
+        HBITMAP hBitmap = CreateCompatibleBitmap(hWindowDC, width, height);
+        HGDIOBJ old_obj = SelectObject(hMemoryDC, hBitmap);
 
-        BitBlt(hDC, 0, 0, width, height, hScreen, topLeft.x, topLeft.y, SRCCOPY);
+        BitBlt(hMemoryDC, 0, 0, width, height, hWindowDC, 0, 0, SRCCOPY);
 
         BITMAPINFOHEADER bmi = { 0 };
         bmi.biSize = sizeof(BITMAPINFOHEADER);
@@ -75,17 +74,22 @@ public:
         memcpy(bmpBuffer.data(), &bmf, sizeof(BITMAPFILEHEADER));
         memcpy(bmpBuffer.data() + sizeof(BITMAPFILEHEADER), &bmi, sizeof(BITMAPINFOHEADER));
 
-        GetDIBits(hScreen, hBitmap, 0, height,
+        GetDIBits(hWindowDC, hBitmap, 0, height,
             bmpBuffer.data() + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER),
             (BITMAPINFO*)&bmi, DIB_RGB_COLORS);
 
-        SelectObject(hDC, old_obj);
+        SelectObject(hMemoryDC, old_obj);
         DeleteObject(hBitmap);
-        DeleteDC(hDC);
-        ReleaseDC(NULL, hScreen);
+        DeleteDC(hMemoryDC);
+        ReleaseDC(hWnd, hWindowDC);
 
         size_t compressedSize = 0;
-        void* pCompressed = tdefl_compress_mem_to_heap(bmpBuffer.data(), bmpBuffer.size(), &compressedSize, TDEFL_DEFAULT_MAX_PROBES | TDEFL_WRITE_ZLIB_HEADER);
+        void* pCompressed = tdefl_compress_mem_to_heap(
+            bmpBuffer.data(),
+            bmpBuffer.size(),
+            &compressedSize,
+            TDEFL_DEFAULT_MAX_PROBES | TDEFL_WRITE_ZLIB_HEADER
+        );
 
         std::vector<uint8_t> finalPayload;
         if (pCompressed) {

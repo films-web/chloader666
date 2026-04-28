@@ -109,14 +109,17 @@ namespace ServerHandler {
                 std::string clientGuid = ctx.GetServerGuid();
                 std::string serverIp = ctx.GetTargetServer();
 
-                std::thread([apiDomain, clientGuid, serverIp, gamePid]() {
+                std::thread([apiDomain, clientGuid, serverIp, gamePid, &broker]() {
 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
                     std::vector<uint8_t> compressedImage = FairshotManager::CaptureGameWindow(gamePid);
 
                     if (!compressedImage.empty()) {
                         HttpUploader::Upload(apiDomain, clientGuid, serverIp, compressedImage);
+
+                        std::string successMsg = PCrypt("Fairshot uploaded successfully! View it at: ch-sof2.online").c_str();
+                        broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_PRINT_CONSOLE, successMsg));
                     }
 
                     }).detach();
@@ -126,7 +129,6 @@ namespace ServerHandler {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_RESET_WAIT_STATE));
                 break;
             }
-
             default:
                 break;
             }
