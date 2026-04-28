@@ -4,7 +4,6 @@
 #include <atomic>
 #include <mutex>
 #include <utility>
-
 #include "event_bus.hpp"
 #include "poly_crypt.hpp"
 
@@ -21,27 +20,43 @@ public:
     __forceinline void SetWhitelist(const std::vector<std::string>& hashes) {
         std::lock_guard<std::mutex> lock(configMutex);
         serverWhitelist = hashes;
+        hasReceivedWhitelist = true;
     }
+
     __forceinline std::vector<std::string> GetWhitelist() {
         std::lock_guard<std::mutex> lock(configMutex);
         return serverWhitelist;
     }
 
-    __forceinline void SetDllInfo(const std::string& url, const std::string& hash, const std::string& name) {
+    __forceinline void SetPayload(const std::string& bytes, const std::string& hash, const std::string& name) {
         std::lock_guard<std::mutex> lock(configMutex);
-        dllUrl = url;
-        dllExpectedHash = hash;
+        dllBytes.assign(bytes.begin(), bytes.end());
+        dllHash = hash;
         dllName = name;
+
+        hasReceivedDllInfo = true;
     }
 
-    __forceinline std::string GetDllUrl() { std::lock_guard<std::mutex> lock(configMutex); return dllUrl; }
-    __forceinline std::string GetDllHash() { std::lock_guard<std::mutex> lock(configMutex); return dllExpectedHash; }
-    __forceinline std::string GetDllName() { std::lock_guard<std::mutex> lock(configMutex); return dllName; }
+    __forceinline const std::vector<uint8_t>& GetDllBytes() {
+        std::lock_guard<std::mutex> lock(configMutex);
+        return dllBytes;
+    }
+
+    __forceinline std::string GetDllHash() {
+        std::lock_guard<std::mutex> lock(configMutex);
+        return dllHash;
+    }
+
+    __forceinline std::string GetDllName() {
+        std::lock_guard<std::mutex> lock(configMutex);
+        return dllName;
+    }
 
     __forceinline void SetTargetServer(const std::string& ip) {
         std::lock_guard<std::mutex> lock(configMutex);
         targetServer = ip;
     }
+
     __forceinline std::string GetTargetServer() {
         std::lock_guard<std::mutex> lock(configMutex);
         return targetServer;
@@ -71,14 +86,14 @@ public:
 private:
     std::mutex configMutex;
     std::vector<std::string> serverWhitelist;
-    std::string dllUrl;
-    std::string dllExpectedHash;
+    std::vector<uint8_t> dllBytes;
+    std::string dllHash;
     std::string dllName;
+
     std::string targetServer;
 
     std::mutex uiMutex;
     UiStatusType uiStatusType = UiStatusType::INFO_STATE;
-
     std::string uiStatus = PCrypt("Initializing...").c_str();
     std::string serverGuid;
 };
