@@ -265,7 +265,7 @@ const char descriptor_table_protodef_messages_2eproto[] ABSL_ATTRIBUTE_SECTION_V
     "&\n\006action\030\001 \001(\0162\026.CheatHaram.ActionType\022"
     "\017\n\007success\030\002 \001(\010\022\017\n\007message\030\003 \001(\t\022\014\n\004gui"
     "d\030\004 \001(\t\022\016\n\006hashes\030\005 \003(\t\022\021\n\tdll_bytes\030\006 \001"
-    "(\t\022\020\n\010dll_hash\030\007 \001(\t\022\020\n\010dll_name\030\010 \001(\t\022("
+    "(\014\022\020\n\010dll_hash\030\007 \001(\t\022\020\n\010dll_name\030\010 \001(\t\022("
     "\n\014players_list\030\t \003(\0132\022.CheatHaram.Player"
     "*\302\002\n\nActionType\022\013\n\007UNKNOWN\020\000\022\020\n\014AUTH_REQ"
     "UEST\020\001\022\017\n\013AUTH_RESULT\020\002\022\025\n\021PK3_WHITELIST"
@@ -1719,7 +1719,7 @@ S2C_Message::GetClassData() const {
   return S2C_Message_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 9, 1, 81, 2>
+const ::_pbi::TcParseTable<4, 9, 1, 72, 2>
 S2C_Message::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_._has_bits_),
@@ -1759,8 +1759,8 @@ S2C_Message::_table_ = {
     {::_pbi::TcParser::FastUR1,
      {42, 0, 0,
       PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.hashes_)}},
-    // string dll_bytes = 6;
-    {::_pbi::TcParser::FastUS1,
+    // bytes dll_bytes = 6;
+    {::_pbi::TcParser::FastBS1,
      {50, 4, 0,
       PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_bytes_)}},
     // string dll_hash = 7;
@@ -1794,8 +1794,8 @@ S2C_Message::_table_ = {
     {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.guid_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // repeated string hashes = 5;
     {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.hashes_), _Internal::kHasBitsOffset + 0, 0, (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
-    // string dll_bytes = 6;
-    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_bytes_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // bytes dll_bytes = 6;
+    {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_bytes_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kBytes | ::_fl::kRepAString)},
     // string dll_hash = 7;
     {PROTOBUF_FIELD_OFFSET(S2C_Message, _impl_.dll_hash_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // string dll_name = 8;
@@ -1807,12 +1807,11 @@ S2C_Message::_table_ = {
       {::_pbi::TcParser::GetTable<::CheatHaram::Player>()},
   }},
   {{
-    "\26\0\0\7\4\6\11\10\10\0\0\0\0\0\0\0"
+    "\26\0\0\7\4\6\0\10\10\0\0\0\0\0\0\0"
     "CheatHaram.S2C_Message"
     "message"
     "guid"
     "hashes"
-    "dll_bytes"
     "dll_hash"
     "dll_name"
   }},
@@ -1921,13 +1920,11 @@ PROTOBUF_NOINLINE void S2C_Message::Clear() {
     }
   }
 
-  // string dll_bytes = 6;
+  // bytes dll_bytes = 6;
   if (CheckHasBit(cached_has_bits, 0x00000010U)) {
     if (!this_._internal_dll_bytes().empty()) {
       const ::std::string& _s = this_._internal_dll_bytes();
-      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "CheatHaram.S2C_Message.dll_bytes");
-      target = stream->WriteStringMaybeAliased(6, _s, target);
+      target = stream->WriteBytesMaybeAliased(6, _s, target);
     }
   }
 
@@ -2020,10 +2017,10 @@ PROTOBUF_NOINLINE void S2C_Message::Clear() {
                                         this_._internal_guid());
       }
     }
-    // string dll_bytes = 6;
+    // bytes dll_bytes = 6;
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
       if (!this_._internal_dll_bytes().empty()) {
-        total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::BytesSize(
                                         this_._internal_dll_bytes());
       }
     }

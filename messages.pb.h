@@ -819,7 +819,7 @@ class S2C_Message final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_guid();
 
   public:
-  // string dll_bytes = 6;
+  // bytes dll_bytes = 6;
   void clear_dll_bytes() ;
   const ::std::string& dll_bytes() const;
   template <typename Arg_ = const ::std::string&, typename... Args_>
@@ -889,7 +889,7 @@ class S2C_Message final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<4, 9,
-                                   1, 81,
+                                   1, 72,
                                    2>
       _table_;
 
@@ -2238,7 +2238,7 @@ S2C_Message::_internal_mutable_hashes() {
   return &_impl_.hashes_;
 }
 
-// string dll_bytes = 6;
+// bytes dll_bytes = 6;
 inline void S2C_Message::clear_dll_bytes() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.dll_bytes_.ClearToEmpty();
@@ -2254,7 +2254,7 @@ template <typename Arg_, typename... Args_>
 PROTOBUF_ALWAYS_INLINE void S2C_Message::set_dll_bytes(Arg_&& arg, Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   SetHasBit(_impl_._has_bits_[0], 0x00000010U);
-  _impl_.dll_bytes_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  _impl_.dll_bytes_.SetBytes(static_cast<Arg_&&>(arg), args..., GetArena());
   // @@protoc_insertion_point(field_set:CheatHaram.S2C_Message.dll_bytes)
 }
 inline ::std::string* PROTOBUF_NONNULL S2C_Message::mutable_dll_bytes()
