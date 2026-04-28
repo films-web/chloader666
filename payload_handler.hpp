@@ -27,7 +27,7 @@ public:
         outFile.write(reinterpret_cast<const char*>(data.data()), data.size());
         outFile.close();
         outSession.path = path;
-        outSession.hFile = CreateFileA(path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        outSession.hFile = CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
         return outSession.IsValid();
     }
