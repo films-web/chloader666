@@ -12,7 +12,7 @@ namespace ConstHash {
         return hash;
     }
 
-    inline uint32_t RunTime(const std::string& str) {
+    static __forceinline uint32_t RunTime(const std::string& str) {
         uint32_t hash = FNV_OFFSET;
         for (char c : str) { hash ^= static_cast<uint32_t>(c); hash *= FNV_PRIME; }
         return hash;
