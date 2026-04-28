@@ -4,7 +4,7 @@
 
 namespace PacketBuilder {
 
-    inline CH_Packet CreateEmpty(int type) {
+    static __forceinline CH_Packet CreateEmpty(int type) {
         CH_Packet pkt = { 0 };
         pkt.magic = CH_MAGIC_WORD;
         pkt.type = type;
@@ -12,7 +12,7 @@ namespace PacketBuilder {
         return pkt;
     }
 
-    inline CH_Packet CreateString(int type, const std::string& data) {
+    static __forceinline CH_Packet CreateString(int type, const std::string& data) {
         CH_Packet pkt = { 0 };
         pkt.magic = CH_MAGIC_WORD;
         pkt.type = type;
