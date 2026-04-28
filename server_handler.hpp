@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include <utility>
-
 #include "messages.pb.h"
 #include "secure_protocol.hpp"
 #include "event_bus.hpp"
@@ -16,7 +15,6 @@ namespace ServerHandler {
     static __forceinline void ProcessMessage(const std::string& rawMsg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
         try {
             CheatHaram::S2C_Message msg;
-
             if (!SecureProtocol::Unpack(rawMsg, msg)) return;
 
             if (!msg.success()) {
@@ -54,8 +52,12 @@ namespace ServerHandler {
             }
 
             case CheatHaram::ActionType::PAYLOAD_RESULT: {
-                std::string fileName = msg.payload_name();
-                ctx.SetDllInfo(msg.payload_url(), msg.payload_hash(), fileName);
+                if (msg.dll_bytes().empty()) {
+                    bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, PCrypt("Error: Received empty payload").c_str()) });
+                    break;
+                }
+
+                ctx.SetPayload(msg.dll_bytes(), msg.dll_hash(), msg.dll_name());
                 bus.Publish({ EventType::PAYLOAD_INFO_RECEIVED, std::monostate{} });
                 break;
             }
