@@ -28,12 +28,12 @@ struct ScanReport {
 
 class IntegrityScanner {
 private:
-    static void ToLowerInPlace(std::string& str) {
+    static __forceinline void ToLowerInPlace(std::string& str) {
         for (char& c : str) c = static_cast<char>(
             std::tolower(static_cast<unsigned char>(c)));
     }
 
-    static const std::unordered_set<uint32_t>& BannedNames() {
+    static __forceinline const std::unordered_set<uint32_t>& BannedNames() {
         static const std::unordered_set<uint32_t> s = {
             CHash("average_armor.shader"),
             CHash("suit_long_coat.shader"),
@@ -51,8 +51,7 @@ private:
         return s;
     }
 
-
-    static const std::unordered_set<uint32_t>& BannedExtensions() {
+    static __forceinline const std::unordered_set<uint32_t>& BannedExtensions() {
         static const std::unordered_set<uint32_t> s = {
             CHash(".glm"),
             CHash(".dll"),
@@ -61,7 +60,7 @@ private:
         return s;
     }
 
-    static ScanReport DeepScanPk3(const std::string& filepath) {
+    static __forceinline ScanReport DeepScanPk3(const std::string& filepath) {
         mz_zip_archive zip{};
         if (!mz_zip_reader_init_file(&zip, filepath.c_str(), 0)) {
             return { ScanResult::HACK_DETECTED, filepath };
@@ -101,7 +100,7 @@ private:
     }
 
 public:
-    static ScanReport VerifyGameFolder(const std::string& gameRoot,
+    static __forceinline ScanReport VerifyGameFolder(const std::string& gameRoot,
         const std::vector<std::string>& whitelist) {
         if (!std::filesystem::exists(gameRoot))
             return { ScanResult::INVALID_PATH, gameRoot };
