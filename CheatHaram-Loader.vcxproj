@@ -153,7 +153,6 @@
     <ClInclude Include="const_hash.hpp" />
     <ClInclude Include="crypto.hpp" />
     <ClInclude Include="dll_integrity.hpp" />
-    <ClInclude Include="downloader.hpp" />
     <ClInclude Include="event_bus.hpp" />
     <ClInclude Include="heartbeat_manager.hpp" />
     <ClInclude Include="hwid.hpp" />

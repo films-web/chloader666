@@ -10,9 +10,9 @@ constexpr char PolyKey() {
 template <size_t Size>
 struct SecureBuffer {
     char data[Size]{};
-    ~SecureBuffer() { SecureZeroMemory(data, Size); }
-    operator const char* () const { return data; }
-    const char* c_str() const { return data; }
+    __forceinline ~SecureBuffer() { SecureZeroMemory(data, Size); }
+    __forceinline operator const char* () const { return data; }
+    __forceinline const char* c_str() const { return data; }
 };
 
 template <size_t N, int Method>
@@ -31,7 +31,7 @@ public:
         }
     }
 
-    auto decrypt() const {
+    __forceinline auto decrypt() const {
         SecureBuffer<N> decrypted{};
         for (size_t i = 0; i < N - 1; ++i) {
             char idx = static_cast<char>(i);
