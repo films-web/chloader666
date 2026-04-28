@@ -20,7 +20,6 @@ namespace ServerHandler {
             if (!SecureProtocol::Unpack(rawMsg, msg)) return;
 
             if (!msg.success()) {
-                // STEALTH: Encrypt fallback error strings
                 std::string errorText = msg.message().empty() ? PCrypt("Unknown server error").c_str() : msg.message();
                 bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Auth Failed: ").c_str()) + errorText) });
                 return;
