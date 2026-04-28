@@ -65,7 +65,6 @@ namespace ServerHandler {
                 std::string guid = msg.guid();
                 if (!guid.empty()) {
                     std::string timeStr = TimeUtils::GetFormattedTime();
-                    // STEALTH: Encrypt the chat notification strings
                     std::string sayCmd = std::string(PCrypt("say ^3CheatHaram: ^6Guid: ^7").c_str()) + guid + PCrypt(" ^1").c_str() + timeStr + PCrypt("\n").c_str();
                     broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, sayCmd));
                     broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_REQUEST_STATE));
