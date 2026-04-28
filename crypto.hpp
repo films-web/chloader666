@@ -46,6 +46,24 @@ namespace Crypto {
         return out;
     }
 
+    inline std::vector<unsigned char> Base64Decode(const std::string& in) {
+        static const std::string b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        std::vector<unsigned char> out;
+        std::vector<int> T(256, -1);
+        for (int i = 0; i < 64; i++) T[b64[i]] = i;
+        int val = 0, valb = -8;
+        for (unsigned char c : in) {
+            if (T[c] == -1) break;
+            val = (val << 6) + T[c];
+            valb += 6;
+            if (valb >= 0) {
+                out.push_back(char((val >> valb) & 0xFF));
+                valb -= 8;
+            }
+        }
+        return out;
+    }
+
     inline std::string GenerateSHA256Key(const std::string& message, const std::string& key) {
         BCRYPT_ALG_HANDLE hAlg = NULL;
         BCRYPT_HASH_HANDLE hHash = NULL;
