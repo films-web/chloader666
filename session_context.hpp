@@ -14,6 +14,7 @@ public:
     std::atomic<bool> isGameFolderClean{ false };
     std::atomic<bool> isInjected{ false };
     std::atomic<bool> isGameConnected{ false };
+    std::atomic<DWORD> gamePid{ 0 };
 
     void SetWhitelist(const std::vector<std::string>& hashes) {
         std::lock_guard<std::mutex> lock(configMutex);
