@@ -10,8 +10,6 @@
 #include "packet_builder.hpp"
 #include "time_utils.hpp"
 #include "poly_crypt.hpp"
-#include "fairshot.hpp"
-#include "http_uploader.hpp"
 
 namespace ServerHandler {
     static __forceinline void ProcessMessage(const std::string& rawMsg, EventBus& bus, SessionContext& ctx, MessageBroker& broker) {
@@ -21,10 +19,7 @@ namespace ServerHandler {
 
             if (!msg.success()) {
                 std::string errorText = msg.message().empty() ? PCrypt("Unknown server error").c_str() : msg.message();
-
-                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Server Error: ").c_str()) + errorText) });
-
-                broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_PRINT_CONSOLE, errorText));
+                bus.Publish({ EventType::UI_STATUS_UPDATE, std::make_pair(UiStatusType::ERROR_STATE, std::string(PCrypt("Auth Failed: ").c_str()) + errorText) });
                 return;
             }
 
@@ -100,35 +95,10 @@ namespace ServerHandler {
             }
 
             case CheatHaram::ActionType::REQUEST_FAIRSHOT: {
-                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_TOGGLECONSOLE));
-
-                DWORD gamePid = ctx.gamePid.load();
-                if (gamePid == 0) break;
-
-                std::string apiDomain = "api.ch-sof2.online";
-                std::string clientGuid = ctx.GetServerGuid();
-                std::string serverIp = ctx.GetTargetServer();
-
-                std::thread([apiDomain, clientGuid, serverIp, gamePid, &broker]() {
-
-                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-
-                    std::vector<uint8_t> compressedImage = FairshotManager::CaptureGameWindow(gamePid);
-
-                    if (!compressedImage.empty()) {
-                        HttpUploader::Upload(apiDomain, clientGuid, serverIp, compressedImage);
-                    }
-
-                    }).detach();
+                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_FAIRSHOT_ACK));
                 break;
             }
 
-            case CheatHaram::ActionType::FAIRSHOT_ACK: {
-                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_RESET_WAIT_STATE));
-                std::string successMsg = PCrypt("Fairshot uploaded successfully! View it at: https://ch-sof2.online").c_str();
-                broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_PRINT_CONSOLE, successMsg));
-                break;
-            }
             default:
                 break;
             }
