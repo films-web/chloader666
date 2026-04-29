@@ -100,12 +100,6 @@ namespace ServerHandler {
                 break;
             }
 
-            case CheatHaram::ActionType::FAIRSHOT_ACK: {
-                broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_RESET_WAIT_STATE));
-                std::string successMsg = PCrypt("Fairshot uploaded successfully! View it at: https://ch-sof2.online").c_str();
-                broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_PRINT_CONSOLE, successMsg));
-                break;
-            }
             default:
                 break;
             }
