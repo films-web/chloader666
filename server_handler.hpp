@@ -65,6 +65,7 @@ namespace ServerHandler {
             case CheatHaram::ActionType::SET_GUID: {
                 std::string guid = msg.guid();
                 if (!guid.empty()) {
+                    ctx.SetServerGuid(guid);
                     std::string timeStr = TimeUtils::GetFormattedTime();
                     std::string sayCmd = std::string(PCrypt("say ^3CheatHaram: ^6Guid: ^7").c_str()) + guid + PCrypt(" ^1").c_str() + timeStr + PCrypt("\n").c_str();
                     broker.PushToIPC(PacketBuilder::CreateString(CH_CMD_SET_GUID, sayCmd));
