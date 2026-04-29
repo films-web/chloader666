@@ -99,7 +99,6 @@ namespace ServerHandler {
                 broker.PushToIPC(PacketBuilder::CreateEmpty(CH_CMD_FAIRSHOT_ACK));
                 break;
             }
-
             default:
                 break;
             }
