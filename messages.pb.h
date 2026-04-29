@@ -99,7 +99,6 @@ enum ActionType : int {
   HEARTBEAT = 13,
   UPDATE_PLAYER_STATE = 14,
   GET_GUID_REQ = 15,
-  FAIRSHOT_ACK = 16,
   ActionType_INT_MIN_SENTINEL_DO_NOT_USE_ =
       ::std::numeric_limits<::int32_t>::min(),
   ActionType_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -110,11 +109,11 @@ extern const uint32_t ActionType_internal_data_[];
 inline constexpr ActionType ActionType_MIN =
     static_cast<ActionType>(0);
 inline constexpr ActionType ActionType_MAX =
-    static_cast<ActionType>(16);
+    static_cast<ActionType>(15);
 inline bool ActionType_IsValid(int value) {
-  return 0 <= value && value <= 16;
+  return 0 <= value && value <= 15;
 }
-inline constexpr int ActionType_ARRAYSIZE = 16 + 1;
+inline constexpr int ActionType_ARRAYSIZE = 15 + 1;
 const ::google::protobuf::EnumDescriptor* PROTOBUF_NONNULL ActionType_descriptor();
 template <typename T>
 const ::std::string& ActionType_Name(T value) {
@@ -125,7 +124,7 @@ const ::std::string& ActionType_Name(T value) {
 }
 template <>
 inline const ::std::string& ActionType_Name(ActionType value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<ActionType_descriptor, 0, 16>(
+  return ::google::protobuf::internal::NameOfDenseEnum<ActionType_descriptor, 0, 15>(
       static_cast<int>(value));
 }
 inline bool ActionType_Parse(
